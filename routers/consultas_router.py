@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Form
 from pydantic import BaseModel
 from typing import List
 from datetime import date, datetime, time
@@ -110,6 +110,29 @@ async def consultas(fecha: str, tipo: int):
         db.close()
 
         
+@router.get("/consultando/", tags=["Consultas"])
+async def consultas(fecha: str, tipo: int,especialidad: int):
+    try: 
+        db = Session()
+        NoEncontrado = []
+        result = (
+            db.query(ConsultasModel)
+            .filter(ConsultasModel.fecha_consulta == fecha, ConsultasModel.tipo_consulta == tipo, ConsultasModel.especialidad == especialidad)
+        ).all()
+        
+        if not result:
+            return JSONResponse(status_code=200, content=jsonable_encoder(NoEncontrado))
+
+        consulta = result[0]  # Desempaquetar la tupla
+        
+        consulta_dict = consulta.__dict__
+        
+        print(f"expediente: {consulta.id} datetime: {now} CONSULTADO")
+        return JSONResponse(status_code=200, content=jsonable_encoder(consulta_dict))
+    except SQLAlchemyError as error:
+        raise HTTPException(status_code=500, detail=f"Error al consultar: {error}")
+    finally:
+        db.close()
                 
  
 #       #Post conectado a SQL
@@ -164,6 +187,22 @@ async def actualizar( consulta: Consultas, id: int):
         return {"message": f"Error al consultar: {error}"}
     finally: 
             print(f" ACTUALIZADO")
+            
+@router.patch("/recepcion/", tags=["Consultas"])
+async def recepcion(id: int, recepcion: date = Form(...)):
+    try:
+        db = Session()
+        result = db.query(ConsultasModel).filter(ConsultasModel.id == id).first()
+        if not result:
+            raise HTTPException(status_code=404, detail="No encontrado")
+        result.recepcion = recepcion  # Usar el valor del parámetro recepcion
+        db.commit()
+        return JSONResponse(status_code=201, content={"message": "Actualización Realizada"})
+    except SQLAlchemyError as error:
+        raise HTTPException(status_code=500, detail=f"Error al consultar: {error}")
+    finally:
+        db.close()
+
 
 #Delete conectado a SQL
 @router.delete("/consulta/{id}", tags=["Consultas"])

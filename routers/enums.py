@@ -121,10 +121,17 @@ class nacionalidadEnum(int, Enum):
     Otro_pais = 9
     No_indica = 0
     
-# class especialidadEnum(int, Enum):
+class especialidadEnum(int, Enum):
     
+   Medicina = 1
+   Pediatria = 2
+   Ginecologia = 3
+   Cirugia = 4
+   Traumatologia = 5
+   Psicologia = 6
+   Nutrición = 7
 
-   
+
 
     
    
