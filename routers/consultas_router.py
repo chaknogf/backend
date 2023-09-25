@@ -39,6 +39,7 @@ class Consultas(BaseModel):
     fecha_egreso: date | None = None
     fecha_recepcion: date | None = None
     tipo_consulta: int | None = None
+    created_at: datetime | None = None
     
     
     
@@ -123,9 +124,11 @@ async def consultas(fecha: str, tipo: int,especialidad: int):
         if not result:
             return JSONResponse(status_code=200, content=jsonable_encoder(NoEncontrado))
 
-        consulta = result[0]  # Desempaquetar la tupla
+       # Convertir los resultados en una lista de diccionarios
+        consulta = [consulta.__dict__ for consulta in result]
         
-        consulta_dict = consulta.__dict__
+        return consulta
+
         
         print(f"expediente: {consulta.id} datetime: {now} CONSULTADO")
         return JSONResponse(status_code=200, content=jsonable_encoder(consulta_dict))
@@ -188,14 +191,15 @@ async def actualizar( consulta: Consultas, id: int):
     finally: 
             print(f" ACTUALIZADO")
             
-@router.patch("/recepcion/", tags=["Consultas"])
-async def recepcion(id: int, recepcion: date = Form(...)):
+@router.patch("/recepcion/{id}", tags=["Consultas"])
+async def recepcion(id: int, fecha_recep: str = Form(...), recep: bool = Form(...)):
     try:
         db = Session()
         result = db.query(ConsultasModel).filter(ConsultasModel.id == id).first()
         if not result:
             raise HTTPException(status_code=404, detail="No encontrado")
-        result.recepcion = recepcion  # Usar el valor del parámetro recepcion
+        result.recepcion = recep  
+        result.fecha_recepcion = fecha_recep  # Convertir a objeto date
         db.commit()
         return JSONResponse(status_code=201, content={"message": "Actualización Realizada"})
     except SQLAlchemyError as error:

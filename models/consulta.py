@@ -2,7 +2,7 @@ from database import database
 import mysql.connector
 from datetime import datetime
 from database.database import Base
-from sqlalchemy import Column, Integer, String, Date, Time, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, Date, Time, ForeignKey, Boolean, DateTime
 from sqlalchemy.orm import relationship
 
 db = database.get_database_connection()
@@ -94,6 +94,7 @@ class ConsultasModel(Base):
     fecha_egreso = Column(Date)
     fecha_recepcion = Column(Date)
     tipo_consulta = Column(Integer)
+    created_at = Column(DateTime)
     
     # Establece la relación con la tabla de pacientes
     pacientes = relationship("PacienteModel", back_populates="consultas")
