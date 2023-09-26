@@ -141,14 +141,25 @@ async def consultas(fecha: str, tipo: int,especialidad: int):
 #       #Post conectado a SQL
 
     #Post conectado a SQL
-@router.post("/consultas/", tags=["Consultas"])
+@router.post("/consultas/",response_model=consultas, tags=["Consultas"])
 async def crear(data: Consultas ):
     try:
-        Db = Session()
-        resgistro = ConsultasModel(**data.dict())
-        Db.add(resgistro)
-        Db.commit()  
+        db = Session()
+        # verificar si ya existe una consulta
+        consulta_verificacion = db.query(ConsultasModel).filter(
+            ConsultasModel.expediente == data.expediente, 
+            ConsultasModel.tipo_consulta == data.tipo_consulta,
+            ConsultasModel.especialidad == data.especialidad,
+            ConsultasModel.fecha_consulta == data.fecha_consulta
+        ).first()
         
+        if consulta_verificacion: 
+            return JSONResponse(status_code=400, content={"ya existe consulta"})
+            
+        resgistro = ConsultasModel(**data.dict())
+        db.add(resgistro)
+        db.commit()  
+         
         return JSONResponse(status_code=201, content={"message": "Se ha registrado la consulta"})
     except SQLAlchemyError as error:
          return {"message": f"error al crear consulta: {error}"}
