@@ -154,7 +154,7 @@ async def crear(data: Consultas ):
         ).first()
         
         if consulta_verificacion: 
-            return JSONResponse(status_code=400, content={"ya existe consulta"})
+            return JSONResponse(status_code=400, content={"message": "ya existe consulta"})
             
         resgistro = ConsultasModel(**data.dict())
         db.add(resgistro)
@@ -203,7 +203,7 @@ async def actualizar( consulta: Consultas, id: int):
             print(f" ACTUALIZADO")
             
 @router.patch("/recepcion/{id}", tags=["Consultas"])
-async def recepcion(id: int, fecha_recep: str = Form(...), recep: bool = Form(...)):
+async def recepcion(id: int, fecha_recep: str, recep: str):
     try:
         db = Session()
         result = db.query(ConsultasModel).filter(ConsultasModel.id == id).first()
