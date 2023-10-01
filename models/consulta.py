@@ -53,9 +53,9 @@ def crear_tabla():
             
 def vista():
     try:
-        command_vistaEmergencia =('''CREATE VIEW vista_emergencia AS SELECT id, tipo_consulta, hoja_emergencia, expediente, nombres, apellidos, fecha_consulta, nacimiento, recepcion  FROM consultas''')
-        command_vistaCoex =('''CREATE VIEW vista_coex AS SELECT id, tipo_consulta, expediente, nombres, apellidos, fecha_consulta, nacimiento, especialidad, recepcion  FROM consultas''')
-        command_vistaIngreso =('''CREATE VIEW vista_ingreso AS SELECT id, tipo_consulta, expediente, nombres, apellidos, fecha_consulta, nacimiento, especialidad, fecha_egreso, recepcion  FROM consultas''')
+        command_vistaEmergencia =('''CREATE VIEW vista_emergencia AS SELECT id, tipo_consulta, hoja_emergencia, expediente, nombres, apellidos, fecha_consulta, nacimiento, recepcion, fecha_recepcion  FROM consultas''')
+        command_vistaCoex =('''CREATE VIEW vista_coex AS SELECT id, tipo_consulta, expediente, nombres, apellidos, fecha_consulta, nacimiento, especialidad, recepcion, fecha_recepcion  FROM consultas''')
+        command_vistaIngreso =('''CREATE VIEW vista_ingreso AS SELECT id, tipo_consulta, expediente, nombres, apellidos, fecha_consulta, nacimiento, especialidad, fecha_egreso, recepcion, fecha_recepcion  FROM consultas''')
         cursor = db.cursor()
         cursor.execute(command_vistaEmergencia, command_vistaCoex, command_vistaIngreso)
         db.commit()

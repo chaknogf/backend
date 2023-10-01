@@ -41,7 +41,6 @@ Tpacientes = ('''
   `fechaDefuncion` varchar(10) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
   UNIQUE KEY `expediente_unico` (`expediente`)
 ) ENGINE=InnoDB AUTO_INCREMENT=72879 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 ''')
