@@ -28,7 +28,7 @@ Tconsultas = ('''
               `especialidad` INT DEFAULT NULL,
               `recepcion` BOOLEAN DEFAULT FALSE,
               `fecha_egreso` DATE DEFAULT NULL,
-              `fecha_recepcion`DATE DEFAULT NULL,
+              `fecha_recepcion`DATETIME DEFAULT NULL,
               `tipo_consulta` INT DEFAULT NULL,
               `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
               `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -92,7 +92,7 @@ class ConsultasModel(Base):
     especialidad = Column(Integer)
     recepcion = Column(Boolean)
     fecha_egreso = Column(Date)
-    fecha_recepcion = Column(Date)
+    fecha_recepcion = Column(DateTime)
     tipo_consulta = Column(Integer)
     created_at = Column(DateTime)
     

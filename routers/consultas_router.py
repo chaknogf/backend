@@ -37,7 +37,7 @@ class Consultas(BaseModel):
     especialidad: int | None = None
     recepcion: bool | None = None
     fecha_egreso: date | None = None
-    fecha_recepcion: date | None = None
+    fecha_recepcion: datetime | None = None
     tipo_consulta: int | None = None
     created_at: datetime | None = None
     
@@ -203,7 +203,7 @@ async def actualizar( consulta: Consultas, id: int):
             print(f" ACTUALIZADO")
             
 @router.patch("/recepcion/{id}", tags=["Consultas"])
-async def recepcion(id: int, fecha_recep: str, recep: str):
+async def recepcion(id: int, fecha_recep: str, recep: bool):
     try:
         db = Session()
         result = db.query(ConsultasModel).filter(ConsultasModel.id == id).first()
