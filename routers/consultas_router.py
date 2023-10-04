@@ -137,6 +137,33 @@ async def consultas(fecha: str, tipo: int,especialidad: int):
         raise HTTPException(status_code=500, detail=f"Error al consultar: {error}")
     finally:
         db.close()
+        
+        
+@router.get("/consult/", tags=["Consultas"])
+async def consult(tipo: int):
+    try: 
+        db = Session()
+        NoEncontrado = []
+        result = (
+            db.query(ConsultasModel)
+            .filter(ConsultasModel.tipo_consulta == tipo)
+        ).all()
+        
+        if not result:
+            return JSONResponse(status_code=200, content=jsonable_encoder(NoEncontrado))
+
+       # Convertir los resultados en una lista de diccionarios
+        consulta = [consulta.__dict__ for consulta in result]
+        
+        return consulta
+
+        
+        print(f"expediente: {consulta.id} datetime: {now} CONSULTADO")
+        return JSONResponse(status_code=200, content=jsonable_encoder(consulta_dict))
+    except SQLAlchemyError as error:
+        raise HTTPException(status_code=500, detail=f"Error al consultar: {error}")
+    finally:
+        db.close()
                 
  
 #       #Post conectado a SQL
@@ -152,6 +179,29 @@ async def crear(data: Consultas ):
             ConsultasModel.tipo_consulta == data.tipo_consulta,
             ConsultasModel.especialidad == data.especialidad,
             ConsultasModel.fecha_consulta == data.fecha_consulta
+        ).first()
+        
+        if consulta_verificacion: 
+            return JSONResponse(status_code=400, content={"message": "ya existe consulta"})
+            
+        resgistro = ConsultasModel(**data.dict())
+        db.add(resgistro)
+        db.commit()  
+         
+        return JSONResponse(status_code=201, content={"message": "Se ha registrado la consulta"})
+    except SQLAlchemyError as error:
+         return {"message": f"error al crear consulta: {error}"}
+    finally:
+        cursor.close()
+        
+@router.post("/consulta/",response_model=consultas, tags=["Consultas"])
+async def registrar(data: Consultas ):
+    try:
+        db = Session()
+        # verificar si ya existe una consulta
+        consulta_verificacion = db.query(ConsultasModel).filter(
+            ConsultasModel.hoja_emergencia == data.hoja_emergencia, 
+            
         ).first()
         
         if consulta_verificacion: 
