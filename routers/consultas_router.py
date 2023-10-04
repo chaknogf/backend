@@ -32,6 +32,7 @@ class Consultas(BaseModel):
     dpi: str | None = None
     direccion: str | None = None
     acompa: str | None = None
+    parente: int  | None = None
     telefono: int | None = None
     nota: str | None = None
     especialidad: int | None = None
@@ -187,6 +188,7 @@ async def actualizar( consulta: Consultas, id: int):
         result.dpi = consulta.dpi
         result.direccion = consulta.direccion
         result.acompa = consulta.acompa
+        result.parente = consulta.parente
         result.telefono = consulta.telefono
         result.nota = consulta.nota
         result.especialidad = consulta.especialidad
