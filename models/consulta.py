@@ -23,6 +23,7 @@ Tconsultas = ('''
               `dpi` VARCHAR(20) DEFAULT NULL,
               `direccion` VARCHAR(100) DEFAULT NULL,
               `acompa` VARCHAR(50) DEFAULT NULL,
+              `parente` INT DEFAULT NULL,
               `telefono` INT DEFAULT NULL,
               `nota` VARCHAR(200) DEFAULT NULL,
               `especialidad` INT DEFAULT NULL,
@@ -87,6 +88,7 @@ class ConsultasModel(Base):
     dpi = Column(String(20))
     direccion = Column(String(100))
     acompa = Column(String(50))
+    parente = Column(Integer)
     telefono = Column(Integer)
     nota = Column(String(200))
     especialidad = Column(Integer)
