@@ -1,7 +1,13 @@
+import io
 from fastapi import APIRouter, File, UploadFile
 import pandas as pd  # Importa Pandas
+from database.database import Session
+from database import database
+from models.consulta import ConsultasModel
 
 router = APIRouter()
+db = database.get_database_connection()
+cursor = db.cursor()
 
 # ... (Otras configuraciones de CORS, middlewares, etc.)
 
@@ -31,3 +37,15 @@ async def analyze_data(data: dict):  # Recibe los datos como un diccionario
 
 # ... (Otras rutas y configuraciones)
 
+@router.get('/analyze-data/', tags=["Data Analysis"])
+async def analyze_data():
+    db =  Session()  # Crea una instancia de la sesión de SQLAlchemy
+    
+    # Consulta la base de datos utilizando SQLAlchemy
+    results = db.query(ConsultasModel).all()  # Por ejemplo, consulta todos los registros de la tabla MyDataModel
+    
+    # Realiza operaciones de análisis de datos en results (por ejemplo, conviértelos en un DataFrame de Pandas)
+    
+    db.close()  # Cierra la sesión de SQLAlchemy
+    
+    return {"message": "Operaciones de análisis de datos completadas", "results": results}
