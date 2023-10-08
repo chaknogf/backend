@@ -138,7 +138,112 @@ async def consultas(fecha: str, tipo: int,especialidad: int):
     finally:
         db.close()
         
+@router.get("/exp/{exp}", tags=["Buscar Consulta"])
+async def expedienteBuscar(exp: int):
+    try:
+        db = Session()
+        result = db.query(ConsultasModel).filter(ConsultasModel.expediente == exp).first()
+        if not result:
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        return JSONResponse(status_code=200, content=jsonable_encoder(result))
+    except SQLAlchemyError as error:
+        return {"message": f"Error al consultar paciente: {error}"}
+    finally:
+        print("CONSULTADO")   
+
+router.get("/hoja/{hoja}", tags=["Buscar Consulta"])
+async def hojaBuscar(hoja: str):
+    try:
+        db = Session()
+        result = db.query(ConsultasModel).filter(ConsultasModel.hoja_emergencia == hoja).first()
+        if not result:
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        return JSONResponse(status_code=200, content=jsonable_encoder(result))
+    except SQLAlchemyError as error:
+        return {"message": f"Error al consultar paciente: {error}"}
+    finally:
+        print("CONSULTADO")   
+
+
+@router.get("/nombre/", tags=["Buscar Consulta"])
+async def nombreBuscar(nombre: str = Query(None, title="Nombre a buscar"), 
+                  apellido: str = Query(None, title="Apellido a buscar")):
+    try:
+        db  = Session()
         
+        query = db.query(ConsultasModel)
+        if nombre:
+            query = query.filter(ConsultasModel.nombres.ilike(f"%{nombre}%"))
+        if apellido:
+            query = query.filter(ConsultasModel.apellidos.ilike(f"%{apellido}%"))
+        vista_paciente = query.all()
+        return vista_paciente
+    
+    except SQLAlchemyError as error:
+        return {"message": f"Error al consultar paciente: {error}"}
+    finally:
+        print(f"id: {id} datetime:{now} CONSULTADO")  
+        
+@router.get("/cui/{cui}", tags=["Buscar Consulta"])
+async def cuiBuscar(cui:str):
+    try:
+        db = Session()
+        query = db.query(ConsultasModel)
+        if cui:
+            query = query.filter(ConsultasModel.dpi == cui)
+        result = query.all()
+        return result
+    except SQLAlchemyError as error:
+        return {'message': f"Erro al consultar: {repr(error)}"}
+    finally:
+        db.close()
+        print ("Consultado {cui}")
+
+@router.get("/recepcion/", tags=["Buscar Consulta"])
+async def recepcionBuscar(recepcion: str = Query(None, title="Recepcion"), 
+                  fecha: str = Query(None, title="Fecha de Recepcion")):
+    try:
+        db  = Session()
+        
+        query = db.query(ConsultasModel)
+        if recepcion:
+            query = query.filter(ConsultasModel.recepcion == recepcion)
+        if fecha:
+            query = query.filter(ConsultasModel.fecha_recepcion == fecha)
+        vista_paciente = query.all()
+        return vista_paciente
+    
+    except SQLAlchemyError as error:
+        return {"message": f"Error al consultar paciente: {error}"}
+    finally:
+        print(f"id: {id} datetime:{now} CONSULTADO") 
+
+@router.get("/egresos/", tags=["Buscar Consulta"])
+async def egresosBuscar(fecha_inicio: str = Query(None, title="Fecha inicial"),
+    fecha_final: str = Query(None, title="Fecha final"),
+):
+    try:
+        db = Session()
+        query = db.query(ConsultasModel)
+
+        if fecha_inicio and fecha_final:
+            fecha_inicio = datetime.strptime(fecha_inicio, "%Y-%m-%d")
+            fecha_final = datetime.strptime(fecha_final, "%Y-%m-%d")
+            query = query.filter(ConsultasModel.fecha_egreso.between(fecha_inicio, fecha_final))
+        elif fecha_inicio:
+            fecha_inicio = datetime.strptime(fecha_inicio, "%Y-%m-%d")
+            query = query.filter(ConsultasModel.fecha_egreso >= fecha_inicio)
+        elif fecha_final:
+            fecha_final = datetime.strptime(fecha_final, "%Y-%m-%d")
+            query = query.filter(ConsultasModel.fecha_egreso <= fecha_final)
+
+        consultas = query.all()
+        return consultas
+    except Exception as e:
+        return {"error": f"Ocurrió un error: {e}"}
+    finally:
+        db.close()
+
 @router.get("/consult/", tags=["Consultas"])
 async def consult(tipo: int):
     try: 
