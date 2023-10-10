@@ -151,7 +151,7 @@ async def expedienteBuscar(exp: int):
     finally:
         print("CONSULTADO")   
 
-router.get("/hoja/{hoja}", tags=["Buscar Consulta"])
+@router.get("/hoja/{hoja}", tags=["Buscar Consulta"])
 async def hojaBuscar(hoja: str):
     try:
         db = Session()
