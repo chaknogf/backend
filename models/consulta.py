@@ -27,6 +27,7 @@ Tconsultas = ('''
               `telefono` INT DEFAULT NULL,
               `nota` VARCHAR(200) DEFAULT NULL,
               `especialidad` INT DEFAULT NULL,
+              `servicio`INT DEFAULT NULL,
               `recepcion` BOOLEAN DEFAULT FALSE,
               `fecha_egreso` DATE DEFAULT NULL,
               `fecha_recepcion`DATETIME DEFAULT NULL,
@@ -92,6 +93,7 @@ class ConsultasModel(Base):
     telefono = Column(Integer)
     nota = Column(String(200))
     especialidad = Column(Integer)
+    servicio = Column(Integer)
     recepcion = Column(Boolean)
     fecha_egreso = Column(Date)
     fecha_recepcion = Column(DateTime)

@@ -36,6 +36,7 @@ class Consultas(BaseModel):
     telefono: int | None = None
     nota: str | None = None
     especialidad: int | None = None
+    servicio: int | None = None
     recepcion: bool | None = None
     fecha_egreso: date | None = None
     fecha_recepcion: datetime | None = None
@@ -347,6 +348,7 @@ async def actualizar( consulta: Consultas, id: int):
         result.telefono = consulta.telefono
         result.nota = consulta.nota
         result.especialidad = consulta.especialidad
+        result.servicio = consulta.servicio
         result.recepcion = consulta.recepcion
         result.fecha_egreso = consulta.fecha_egreso
         result.fecha_recepcion = consulta.fecha_recepcion
