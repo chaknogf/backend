@@ -55,11 +55,12 @@ def crear_tabla():
             
 def vista():
     try:
-        command_vistaEmergencia =('''CREATE VIEW vista_emergencia AS SELECT id, tipo_consulta, hoja_emergencia, expediente, nombres, apellidos, fecha_consulta, nacimiento, recepcion, fecha_recepcion  FROM consultas''')
-        command_vistaCoex =('''CREATE VIEW vista_coex AS SELECT id, tipo_consulta, expediente, nombres, apellidos, fecha_consulta, nacimiento, especialidad, recepcion, fecha_recepcion  FROM consultas''')
-        command_vistaIngreso =('''CREATE VIEW vista_ingreso AS SELECT id, tipo_consulta, expediente, nombres, apellidos, fecha_consulta, nacimiento, especialidad, fecha_egreso, recepcion, fecha_recepcion  FROM consultas''')
+        # command_vistaEmergencia =('''CREATE VIEW vista_emergencia AS SELECT id, tipo_consulta, hoja_emergencia, expediente, nombres, apellidos, fecha_consulta, nacimiento, recepcion, fecha_recepcion  FROM consultas''')
+        # command_vistaCoex =('''CREATE VIEW vista_coex AS SELECT id, tipo_consulta, expediente, nombres, apellidos, fecha_consulta, nacimiento, especialidad, recepcion, fecha_recepcion  FROM consultas''')
+        # command_vistaIngreso =('''CREATE VIEW vista_ingreso AS SELECT id, tipo_consulta, expediente, nombres, apellidos, fecha_consulta, nacimiento, especialidad, fecha_egreso, recepcion, fecha_recepcion  FROM consultas''')
+        command_vistaConsulta =(''' CREATE VIEW vista_consultas AS SELECT hoja_emergencia,expediente,fecha_consulta,nombres,apellidos,dpi,id,hora,fecha_egreso,especialidad,servicio,tipo_consulta FROM consultas''')
         cursor = db.cursor()
-        cursor.execute(command_vistaEmergencia, command_vistaCoex, command_vistaIngreso)
+        cursor.execute(command_vistaConsulta)
         db.commit()
         return {"message": "Vistas creadas correctamente."}
     except Exception as error:
@@ -104,41 +105,22 @@ class ConsultasModel(Base):
     pacientes = relationship("PacienteModel", back_populates="consultas")
     
     
-class VistaEmergencia(Base):
-    __tablename__ = "vista_emergencia"
-        
-    id = Column(Integer, primary_key=True)
-    hoja_emergencia = Column(String(12))
-    expediente = Column(Integer,ForeignKey('pacientes.expediente'))
-    nombres = Column(String(50))
-    apellidos = Column(String(50))
-    fecha_consulta = Column(Date)
-    nacimiento = Column(Date)
-    tipo_consulta = Column(Integer)
     
-class VistaCoex(Base):
-    __tablename__ = "vista_coex"
-        
+class VistaConsultas(Base):
+    __tablename__ = "vista_consultas"
+
     id = Column(Integer, primary_key=True)
-    expediente = Column(Integer,ForeignKey('pacientes.expediente'))
-    nombres = Column(String(50))
-    apellidos = Column(String(50))
+    hoja_emergencia = Column(String)
+    expediente = Column(Integer)
     fecha_consulta = Column(Date)
-    nacimiento = Column(Date)
-    especialidad = Column(Integer)
-    tipo_consulta = Column(Integer)
-    
-class VistaIngreso(Base):
-    __tablename__ = "vista_ingreso"
-        
-    id = Column(Integer, primary_key=True)
-    expediente = Column(Integer,ForeignKey('pacientes.expediente'))
-    nombres = Column(String(50))
-    apellidos = Column(String(50))
-    fecha_consulta = Column(Date)
-    nacimiento = Column(Date)
-    especialidad = Column(Integer)
+    nombres = Column(String)
+    apellidos = Column(String)
+    dpi = Column(String)
+    hora = Column(Time)
     fecha_egreso = Column(Date)
-    tipo_consulta = Column(Integer)
+    especialidad = Column(String)
+    servicio = Column(String)
+    tipo_consulta = Column(String)
+    
     
      

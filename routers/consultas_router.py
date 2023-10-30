@@ -4,7 +4,7 @@ from typing import List
 from datetime import date, datetime, time
 from database.database import engine, Session, Base
 from database import database
-from models.consulta import ConsultasModel, VistaEmergencia, VistaCoex, VistaIngreso
+from models.consulta import ConsultasModel, VistaConsultas
 from models.paciente import PacienteModel
 #from models.paciente import PacienteModel
 from fastapi.responses import JSONResponse
@@ -56,7 +56,53 @@ async def obtener_consultas():
         return {"message": f"error al consultar: {error}"}
     finally:
         print("consultado")
+   
+@router.get("/filtro/", tags=["Consultas"])
+async def filtro(
+    id: int = Query(None, description="Número de id"),
+    hoja_emergencia: str = Query(None, description="Hoja de Emergencia"),
+    expediente: int = Query(None, description="Número de Expediente"),
+    fecha_consulta: str = Query(None, description="Fecha de Consulta"),
+    nombres: str = Query(None, description="Nombres"),
+    apellidos: str = Query(None, description="Apellidos"),
+    dpi: str = Query(None, description="DPI"),
+    fecha_egreso: str = Query(None, description="Fecha de Egreso"),
+    
+                ):
+    try:
         
+        db = Session()
+        query = db.query(VistaConsultas)
+
+        # Agregar condiciones para los filtros con coincidencias parciales
+        if id is not None:
+            query = query.filter(VistaConsultas.id == id)
+            
+        if hoja_emergencia:
+            query = query.filter(VistaConsultas.hoja_emergencia.ilike(f"%{hoja_emergencia}%"))
+
+        if expediente is not None:
+            query = query.filter(VistaConsultas.expediente == expediente)
+
+        if fecha_consulta:
+            query = query.filter(VistaConsultas.fecha_consulta.ilike(f"%{fecha_consulta}%"))
+
+        if nombres:
+            query = query.filter(VistaConsultas.nombres.ilike(f"%{nombres}%"))
+
+        if apellidos:
+            query = query.filter(VistaConsultas.apellidos.ilike(f"%{apellidos}%"))
+
+        if dpi:
+            query = query.filter(VistaConsultas.dpi.ilike(f"%{dpi}%"))
+
+        if fecha_egreso:
+            query = query.filter(VistaConsultas.fecha_egreso.ilike(f"%{fecha_egreso}%"))
+
+        result = query.all()
+        return result
+    except Exception as e:
+        return {"error": str(e)}    
         
 @router.get("/consulta/", tags=["Consultas"])
 async def buscarId(id: int):
