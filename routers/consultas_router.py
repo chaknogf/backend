@@ -67,6 +67,7 @@ async def filtro(
     apellidos: str = Query(None, description="Apellidos"),
     dpi: str = Query(None, description="DPI"),
     fecha_egreso: str = Query(None, description="Fecha de Egreso"),
+    tipo_consulta: int = Query(None, description="Tipo de consulta"),
     
                 ):
     try:
@@ -98,6 +99,9 @@ async def filtro(
 
         if fecha_egreso:
             query = query.filter(VistaConsultas.fecha_egreso.ilike(f"%{fecha_egreso}%"))
+            
+        if tipo_consulta:
+            query = query.filter(VistaConsultas.tipo_consulta == tipo_consulta)
 
         result = query.all()
         return result
