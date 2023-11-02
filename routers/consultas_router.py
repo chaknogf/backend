@@ -4,9 +4,8 @@ from typing import List
 from datetime import date, datetime, time
 from database.database import engine, Session, Base
 from database import database
-from models.consulta import ConsultasModel, VistaConsultas
+from models.consulta import ConsultasModel, ConsultasModel
 from models.paciente import PacienteModel
-#from models.paciente import PacienteModel
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import func, select
@@ -37,13 +36,13 @@ class Consultas(BaseModel):
     nota: str | None = None
     especialidad: int | None = None
     servicio: int | None = None
-    recepcion: bool | None = None
+    status: int | None = None
     fecha_egreso: date | None = None
     fecha_recepcion: datetime | None = None
     tipo_consulta: int | None = None
     created_at: datetime | None = None
     
-    
+
     
     #Get conectados a SQL
 @router.get("/consultas/", tags=["Consultas"])
@@ -57,6 +56,7 @@ async def obtener_consultas():
     finally:
         print("consultado")
    
+ConsultasModel = ConsultasModel
 @router.get("/filtro/", tags=["Consultas"])
 async def filtro(
     id: int = Query(None, description="Número de id"),
@@ -68,40 +68,44 @@ async def filtro(
     dpi: str = Query(None, description="DPI"),
     fecha_egreso: str = Query(None, description="Fecha de Egreso"),
     tipo_consulta: int = Query(None, description="Tipo de consulta"),
+    status: int = Query(None, description="status")
     
                 ):
     try:
         
         db = Session()
-        query = db.query(VistaConsultas)
+        query = db.query(ConsultasModel)
 
         # Agregar condiciones para los filtros con coincidencias parciales
         if id is not None:
-            query = query.filter(VistaConsultas.id == id)
+            query = query.filter(ConsultasModel.id == id)
             
         if hoja_emergencia:
-            query = query.filter(VistaConsultas.hoja_emergencia.ilike(f"%{hoja_emergencia}%"))
+            query = query.filter(ConsultasModel.hoja_emergencia.ilike(f"%{hoja_emergencia}%"))
 
         if expediente is not None:
-            query = query.filter(VistaConsultas.expediente == expediente)
+            query = query.filter(ConsultasModel.expediente == expediente)
 
         if fecha_consulta:
-            query = query.filter(VistaConsultas.fecha_consulta.ilike(f"%{fecha_consulta}%"))
+            query = query.filter(ConsultasModel.fecha_consulta.ilike(f"%{fecha_consulta}%"))
 
         if nombres:
-            query = query.filter(VistaConsultas.nombres.ilike(f"%{nombres}%"))
+            query = query.filter(ConsultasModel.nombres.ilike(f"%{nombres}%"))
 
         if apellidos:
-            query = query.filter(VistaConsultas.apellidos.ilike(f"%{apellidos}%"))
+            query = query.filter(ConsultasModel.apellidos.ilike(f"%{apellidos}%"))
 
         if dpi:
-            query = query.filter(VistaConsultas.dpi.ilike(f"%{dpi}%"))
+            query = query.filter(ConsultasModel.dpi.ilike(f"%{dpi}%"))
 
         if fecha_egreso:
-            query = query.filter(VistaConsultas.fecha_egreso.ilike(f"%{fecha_egreso}%"))
+            query = query.filter(ConsultasModel.fecha_egreso == fecha_egreso)
             
         if tipo_consulta:
-            query = query.filter(VistaConsultas.tipo_consulta == tipo_consulta)
+            query = query.filter(ConsultasModel.tipo_consulta == tipo_consulta)
+
+        if status:
+            query = query.filter(ConsultasModel.status == status)
 
         result = query.all()
         return result
@@ -399,7 +403,7 @@ async def actualizar( consulta: Consultas, id: int):
         result.nota = consulta.nota
         result.especialidad = consulta.especialidad
         result.servicio = consulta.servicio
-        result.recepcion = consulta.recepcion
+        result.status = consulta.status
         result.fecha_egreso = consulta.fecha_egreso
         result.fecha_recepcion = consulta.fecha_recepcion
         result.tipo_consulta = consulta.tipo_consulta

@@ -1,5 +1,5 @@
 from fastapi import FastAPI, File, UploadFile, WebSocket
-from routers import citas_router, consultas_router, municipio, paciente_router, enums, pandas
+from routers import citas_router, consultas_router, municipio, paciente_router, enums, pandas, uisau_router
 from models import citas, consulta, paciente
 from database import xDB
 from fastapi.staticfiles import StaticFiles
@@ -53,5 +53,6 @@ app.include_router(paciente_router.router)
 app.include_router(municipio.router)
 app.include_router(consultas_router.router)
 app.include_router(pandas.router)
+app.include_router(uisau_router.router)
 
  
