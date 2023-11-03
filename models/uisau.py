@@ -11,7 +11,7 @@ now = datetime.now()
 
 Tuisau = ('''
             CREATE TABLE uisau (
-    `id` INT DEFAULT NULL,
+    id` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `expediente` INT DEFAULT NULL,
     `nombres`VARCHAR(100) DEFAULT NULL,
     `apellidos` VARCHAR(100) DEFAULT NULL,
