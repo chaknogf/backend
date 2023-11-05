@@ -11,6 +11,7 @@ router = APIRouter()
 class LoginRequest(BaseModel):
     email: str
     password: str
+   
     
     
 def get_db_session() -> Session:
@@ -34,4 +35,4 @@ async def login(form_data: LoginRequest, db: Session = Depends(get_db_session)):
 
     # Las credenciales son válidas, generamos el token JWT
     access_token = create_access_token(data={"sub": usuario.email})
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer", "user_code": usuario.code}
