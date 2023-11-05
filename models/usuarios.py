@@ -2,18 +2,18 @@ from database import database
 import mysql.connector
 from datetime import datetime
 from database.database import Base
-from sqlalchemy import Column, Integer, String, Date, Time, ForeignKey, Text, Boolean, DateTime
+from sqlalchemy import Column, Integer, String,BigInteger
 from sqlalchemy.orm import relationship
 
 
 db = database.get_database_connection()
 
 Tusuarios = ('''
-             REATE TABLE usuarios (
+             CREATE TABLE usuarios (
     `id` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `code` INT DEFAULT NULL,
     `name`VARCHAR(200) DEFAULT NULL,
-    `dpi` INT DEFAULT NULL,
+    `dpi` BIGINT DEFAULT NULL,
     `email` VARCHAR(100) DEFAULT NULL,
     `password` VARCHAR(10) DEFAULT NULL,
     `rol` INT DEFAULT NULL,
@@ -43,7 +43,7 @@ class UsuariosModel(Base):
     id = Column(Integer, primary_key=True)
     code = Column(Integer)
     name = Column(String(200))
-    dpi = Column(Integer)
+    dpi = Column(BigInteger)
     email = Column(String(100))
     password = Column(String(10))
     rol = Column(Integer)

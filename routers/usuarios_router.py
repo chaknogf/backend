@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query, Form
+from fastapi import APIRouter, HTTPException, Depends, Form
 from pydantic import BaseModel
 from typing import List
 from datetime import date, datetime, time
@@ -19,7 +19,7 @@ class Usuarios(BaseModel):
     id: int
     code: int 
     name: str
-    dpi: str | None = None
+    dpi: int | None = None
     email: str | None = None
     password: str | None = None
     rol: int
@@ -36,7 +36,7 @@ async def obtener_usuarios():
     except SQLAlchemyError as error:
         return {"message": f"error al consultar: {error}"}
     finally:
-        print("consultado")
+      cursor.close()
         
 
 @router.get("/usurio/", tags=["usuarios"])
@@ -48,44 +48,43 @@ async def obtener_usuarios(cod: int):
     except SQLAlchemyError as error:
         return {"message": f"error al consultar: {error}"}
     finally:
-        print("consultado")
-        
-@router.post("/usuriocrear/", response_class=Usuarios, tags=["usuarios"])
-async def crear(data: Usuarios):
-    try:
-        db = Session()
-        #verificar si ya existe una cosulta
-        verificar = db.query(UsuariosModel).filter(
-            UsuariosModel.code == data.code,
-            UsuariosModel.name == data.name,
-            UsuariosModel.dpi == data.dpi,
-            UsuariosModel.email == data.email
-        ).first()
-        
-        if verificar: 
-            return JSONResponse(status_code=400, content={"message": "ya existe usuario"})
-            
-        resgistro = UsuariosModel(**data.dict())
-        db.add(resgistro)
-        db.commit()  
-         
-        return JSONResponse(status_code=201, content={"message": "Se ha creado usuario"})
-    except SQLAlchemyError as error:
-         return {"message": f"error al crear consulta: {error}"}
-    finally:
         cursor.close()
         
-#Put conectado a SQL
-@router.put("/editarusuario/{id}", tags=["usuarios"])
-async def actualizar( user: Usuarios, cod: int):
+@router.post("/user/",  tags=["usuarios"])
+async def crear_user(user: Usuarios):
     try:
         db = Session()
-        result = db.query(UsuariosModel).filter(UsuariosModel.code == cod).first()
+        # Verificar si ya existe un usuario
+        verificar = db.query(UsuariosModel).filter(
+            UsuariosModel.code == user.code,
+            UsuariosModel.name == user.name,
+            UsuariosModel.dpi == user.dpi,
+            UsuariosModel.email == user.email
+        ).first()
+
+        if verificar:
+            return JSONResponse(status_code=400, content={"message": "ya existe el usuario"})
+
+        registro = UsuariosModel(**user.dict())
+        db.add(registro)
+        db.commit()
+        cursor.close()
+        return JSONResponse(status_code=201, content={"message": "Se ha creado el usuario"})
+    except SQLAlchemyError as error:
+        return {"message": f"error al crear usuario: {error}"}
+    
+
+#Put conectado a SQL
+@router.put("/editarusuario/{id}", tags=["usuarios"])
+async def actualizar( user: Usuarios, id: int):
+    try:
+        db = Session()
+        result = db.query(UsuariosModel).filter(UsuariosModel.id == id).first()
         if not result:
             return JSONResponse(status_code=404, content={"message": "No encontrado"})
         result.id = user.id
         result.code = user.code
-        result.name = user.code
+        result.name = user.name
         result.dpi = user.dpi
         result.email = user.email
         result.password = user.password
@@ -96,13 +95,13 @@ async def actualizar( user: Usuarios, cod: int):
     except SQLAlchemyError as error:
         return {"message": f"Error al consultar: {error}"}
     finally: 
-            print(f" ACTUALIZADO")
+            cursor.close()
             
             
 
 #Delete conectado a SQL
-@router.delete("/usuario/{cod}", tags=["usuarios"])
-async def eliminar(cod: int):
+@router.delete("/usuario/{id}", tags=["usuarios"])
+async def eliminar(id: int):
     try:
         db = Session()
         result = db.query(UsuariosModel).filter(UsuariosModel.id == id).first()
@@ -114,4 +113,4 @@ async def eliminar(cod: int):
     except SQLAlchemyError as error:
         return {"message": f"Error al consultar: {error}"}
     finally:
-            print(f" ELIMINADO realizado")
+           cursor.close()

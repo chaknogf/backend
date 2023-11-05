@@ -4,7 +4,7 @@ from typing import List
 from datetime import date, datetime, time
 from database.database import engine, Session, Base
 from database import database
-from models.consulta import ConsultasModel, ConsultasModel
+from models.consulta import ConsultasModel, VistaConsultas
 from models.paciente import PacienteModel
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
@@ -32,7 +32,7 @@ class Consultas(BaseModel):
     direccion: str | None = None
     acompa: str | None = None
     parente: int  | None = None
-    telefono: int | None = None
+    telefono: str | None = None
     nota: str | None = None
     especialidad: int | None = None
     servicio: int | None = None
@@ -40,7 +40,13 @@ class Consultas(BaseModel):
     fecha_egreso: date | None = None
     fecha_recepcion: datetime | None = None
     tipo_consulta: int | None = None
-    created_at: datetime | None = None
+    prenatal: int | None = None
+    lactancia: int | None = None
+    dx: str | None = None
+    folios: int | None = None
+    medico: int | None = None
+    archiva: int | None = None
+   
     
 
     
@@ -329,7 +335,7 @@ async def consult(tipo: int):
 #       #Post conectado a SQL
 
     #Post conectado a SQL
-@router.post("/consultas/",response_model=consultas, tags=["Consultas"])
+@router.post("/coex/",response_model=consultas, tags=["Consultas"])
 async def crear(data: Consultas ):
     try:
         db = Session()
@@ -354,7 +360,7 @@ async def crear(data: Consultas ):
     finally:
         cursor.close()
         
-@router.post("/consulta/",response_model=consultas, tags=["Consultas"])
+@router.post("/emergencia/",response_model=consultas, tags=["Consultas"])
 async def registrar(data: Consultas ):
     try:
         db = Session()
@@ -407,6 +413,11 @@ async def actualizar( consulta: Consultas, id: int):
         result.fecha_egreso = consulta.fecha_egreso
         result.fecha_recepcion = consulta.fecha_recepcion
         result.tipo_consulta = consulta.tipo_consulta
+        result.prenatal = consulta.prenatal
+        result.lactancia = consulta.lactancia
+        result.dx = consulta.dx
+        result.archiva = consulta.archiva
+        result.folios = consulta.folios
     
         db.commit()
         return JSONResponse(status_code=201, content={"message": "Actualización Realizada"})

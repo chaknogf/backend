@@ -2,7 +2,7 @@ from database import database
 import mysql.connector
 from datetime import datetime
 from database.database import Base
-from sqlalchemy import Column, Integer, String, Date, Time, ForeignKey, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Date, Time, ForeignKey, DateTime, TIMESTAMP
 from sqlalchemy.orm import relationship
 
 db = database.get_database_connection()
@@ -24,14 +24,20 @@ Tconsultas = ('''
               `direccion` VARCHAR(100) DEFAULT NULL,
               `acompa` VARCHAR(50) DEFAULT NULL,
               `parente` INT DEFAULT NULL,
-              `telefono` INT DEFAULT NULL,
+              `telefono` VARCHAR(20) DEFAULT NULL,
               `nota` VARCHAR(200) DEFAULT NULL,
               `especialidad` INT DEFAULT NULL,
               `servicio`INT DEFAULT NULL,
-              `recepcion` INT DEFAULT 1,
+              `status` INT DEFAULT NULL,
               `fecha_egreso` DATE DEFAULT NULL,
               `fecha_recepcion`DATETIME DEFAULT NULL,
               `tipo_consulta` INT DEFAULT NULL,
+              `prenatal` INT DEFAULT NULL,
+              `lactancia` INT DEFAULT NULL,
+              `dx` VARCHAR(100) DEFAULT NULL,
+              `folios` INT DEFAULT NULL,
+              `medico` INT DEFAULT NULL,
+              `archiva` INT DEFAULT NULL,
               `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
               `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
               FOREIGN KEY (expediente) REFERENCES pacientes (expediente)
@@ -91,7 +97,7 @@ class ConsultasModel(Base):
     direccion = Column(String(100))
     acompa = Column(String(50))
     parente = Column(Integer)
-    telefono = Column(Integer)
+    telefono = Column(String)
     nota = Column(String(200))
     especialidad = Column(Integer)
     servicio = Column(Integer)
@@ -99,7 +105,14 @@ class ConsultasModel(Base):
     fecha_egreso = Column(Date)
     fecha_recepcion = Column(DateTime)
     tipo_consulta = Column(Integer)
-    created_at = Column(DateTime)
+    prenatal = Column(Integer)
+    lactancia = Column(Integer)
+    dx = Column(String(100))
+    folios = Column(Integer)
+    medico = Column(Integer)
+    archiva = Column(Integer)
+   
+    
     
     # Establece la relación con la tabla de pacientes
     pacientes = relationship("PacienteModel", back_populates="consultas")

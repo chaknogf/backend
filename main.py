@@ -1,19 +1,20 @@
-from fastapi import FastAPI, File, UploadFile, WebSocket
-from routers import citas_router, consultas_router, municipio, paciente_router, enums, pandas, uisau_router
-from models import citas, consulta, paciente
-from database import xDB
-from fastapi.staticfiles import StaticFiles
-import getpass
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from middlewares.error_hendler import ErrorHandler
-import websockets
-#from middlewares.jwt_bearer import JWTBearer
+from login_router import router as login_router
+from auth import decode_token, verify_token
+from routers import citas_router, consultas_router, municipio, paciente_router, pandas, uisau_router, usuarios_router
+import jwt
 
+
+# Define un middleware para verificar el token JWT
+async def check_jwt_token(token: str = Depends(decode_token)):
+    if token is None:
+        raise HTTPException(status_code=401, detail="Token inválido o expirado")
 
 
 app = FastAPI()
 app.add_middleware(ErrorHandler)
-
 
 allow_origins = ["*"]
 
@@ -25,34 +26,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Incluye las rutas del módulo login_router
+app.include_router(login_router, tags=["login"])
 
-@app.get('/mkVp', tags=["SQL"])
-def mkbd():
-   # cts = citas.crear_tabla()
-    #patien = paciente.crear_tabla()
-    v_paciente = paciente.vista()
-    v_consulta = consulta.vista()
-    v_citas = citas.vistaC()
-    return  v_paciente, v_citas, v_consulta
+# Importación de routers y aplicación de middleware de verificación de token JWT
+app.include_router(citas_router.router, dependencies=[Depends(check_jwt_token)])
+app.include_router(paciente_router.router, dependencies=[Depends(check_jwt_token)])
+app.include_router(municipio.router, dependencies=[Depends(check_jwt_token)])
+app.include_router(consultas_router.router, dependencies=[Depends(check_jwt_token)])
+app.include_router(pandas.router, dependencies=[Depends(check_jwt_token)])
+app.include_router(uisau_router.router, dependencies=[Depends(check_jwt_token)])
+app.include_router(usuarios_router.router, dependencies=[Depends(check_jwt_token)])
 
-@app.get('/importdb', tags=["SQL"])
-def import_data(file: UploadFile = File(...)):
-    data = xDB.import_db(file)
-    return {"filename": file.filename}
-
-@app.get('/xportDB', tags=["SQL"])
-def export_data(table_name: str):
-    
-    result = xDB.run_mysqldump(table_name)
-    return {"message": result}
-
-
-#importacion de routers
-app.include_router(citas_router.router)
-app.include_router(paciente_router.router)
-app.include_router(municipio.router)
-app.include_router(consultas_router.router)
-app.include_router(pandas.router)
-app.include_router(uisau_router.router)
-
- 
+# # Define una ruta protegida
+# @app.get("/ruta-protegida", tags=["ruta protegida"], dependencies=[Depends(check_jwt_token)])
+# async def ruta_protegida():
+#     return {"mensaje": "¡Has accedido a una ruta protegida!"}

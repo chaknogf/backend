@@ -1,7 +1,7 @@
 import mysql.connector
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 
 MYSQL_HOST = "localhost"
 MYSQL_USER = "root"
@@ -21,10 +21,19 @@ def get_database_connection():
 # Configuración de la conexión a la base de datos
 SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:Prometeus.0@localhost/test_api"
 engine = create_engine(SQLALCHEMY_DATABASE_URL,echo=False)
-Session = sessionmaker(bind=engine)
+Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 
 #Declaración de la base de datos
 Base = declarative_base()
+
+
+
+def get_database_session() -> Session:
+    Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    db = Session()
+    return db
+
 
 
 #Base.metada.create_all(bind=engine)
