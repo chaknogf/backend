@@ -37,12 +37,12 @@ Tpacientes = ('''
   `telefono_responsable` int DEFAULT NULL,
   `estado` varchar(2) DEFAULT NULL,
   `exp_madre` int DEFAULT NULL,
-  `user` varchar(50) DEFAULT NULL,
+  `created_by` varchar(8) DEFAULT NULL,
   `fechaDefuncion` varchar(10) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE KEY `expediente_unico` (`expediente`)
-) ENGINE=InnoDB AUTO_INCREMENT=72879 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+) ENGINE=InnoDB AUTO_INCREMENT=72879 DEFAULT CHARSET=utf8mb4 
 ''')
 
 
@@ -108,7 +108,7 @@ class PacienteModel(Base):
     telefono_responsable = Column(Integer)
     estado = Column(String(2))
     exp_madre = Column(Integer)
-    user = Column(String(50))
+    created_by = Column(String(8))
     fechaDefuncion = Column(String(10))
    
 # Configura la relación con la tabla de citas

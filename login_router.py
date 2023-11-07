@@ -9,7 +9,7 @@ router = APIRouter()
 
 
 class LoginRequest(BaseModel):
-    email: str
+    username: str
     password: str
    
     
@@ -25,7 +25,7 @@ def get_db_session() -> Session:
 
 @router.post("/login", tags=["login"])
 async def login(form_data: LoginRequest, db: Session = Depends(get_db_session)):
-    usuario = db.query(UsuariosModel).filter(UsuariosModel.email == form_data.email).first()
+    usuario = db.query(UsuariosModel).filter(UsuariosModel.username == form_data.username).first()
     if usuario is None:
         raise HTTPException(status_code=401, detail="Credenciales inválidas")
 
@@ -34,5 +34,5 @@ async def login(form_data: LoginRequest, db: Session = Depends(get_db_session)):
         raise HTTPException(status_code=401, detail="Credenciales inválidas")
 
     # Las credenciales son válidas, generamos el token JWT
-    access_token = create_access_token(data={"sub": usuario.email})
-    return {"access_token": access_token, "token_type": "bearer", "user_code": usuario.code}
+    access_token = create_access_token(data={"sub": usuario.username})
+    return {"access_token": access_token, "token_type": "bearer", "user_code": usuario.code, "username": usuario.username}

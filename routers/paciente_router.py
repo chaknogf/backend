@@ -77,7 +77,7 @@ class Paciente(BaseModel):
     telefono_responsable: int | None = None
     estado: EstadoEnum| None = None
     exp_madre: int | None = None
-    user: str | None = None
+    created_by: str | None = None
     fechaDefuncion: str | None = None
     
 
@@ -206,7 +206,7 @@ async def actualizar_paciente( Pacient: Paciente, exp: int):
         result.telefono_responsable = Pacient.telefono_responsable
         result.estado = Pacient.estado
         result.exp_madre = Pacient.exp_madre
-        result.user = Pacient.user
+        result.created_by = Pacient.created_by
         result.fechaDefuncion = Pacient.fechaDefuncion
         
       

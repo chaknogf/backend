@@ -12,6 +12,7 @@ Tusuarios = ('''
              CREATE TABLE usuarios (
     `id` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `code` INT DEFAULT NULL,
+    `username` VARCHAR(8) DEFAULT NULL,
     `name`VARCHAR(200) DEFAULT NULL,
     `dpi` BIGINT DEFAULT NULL,
     `email` VARCHAR(100) DEFAULT NULL,
@@ -42,6 +43,7 @@ class UsuariosModel(Base):
     __tablename__ = "usuarios"
     id = Column(Integer, primary_key=True)
     code = Column(Integer)
+    username = Column(String)
     name = Column(String(200))
     dpi = Column(BigInteger)
     email = Column(String(100))

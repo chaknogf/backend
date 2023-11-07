@@ -18,6 +18,7 @@ now = datetime.now()
 class Usuarios(BaseModel):
     id: int
     code: int 
+    username: str
     name: str
     dpi: int | None = None
     email: str | None = None
@@ -57,6 +58,7 @@ async def crear_user(user: Usuarios):
         # Verificar si ya existe un usuario
         verificar = db.query(UsuariosModel).filter(
             UsuariosModel.code == user.code,
+            UsuariosModel.username == user.username,
             UsuariosModel.name == user.name,
             UsuariosModel.dpi == user.dpi,
             UsuariosModel.email == user.email
@@ -84,6 +86,7 @@ async def actualizar( user: Usuarios, id: int):
             return JSONResponse(status_code=404, content={"message": "No encontrado"})
         result.id = user.id
         result.code = user.code
+        result.username = user.username
         result.name = user.name
         result.dpi = user.dpi
         result.email = user.email

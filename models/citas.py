@@ -14,12 +14,13 @@ now = datetime.now()
 Tcitas = ('''
           CREATE TABLE IF NOT EXISTS citas (
          `id` INT AUTO_INCREMENT PRIMARY KEY,
-         `fecha` DATE,
-         `expediente` INT,
-         `especialidad` INT,
-         `cirugia_programada` DATE,
-         `nota` VARCHAR(255),
-         `estado` BOOLEAN DEFAULT FALSE,
+         `fecha` DATE DEFAULT NULL,
+         `expediente` INT DEFAULT NULL,
+         `especialidad` INT DEFAULT NULL,
+         `cirugia_programada` DATE DEFAULT NULL,
+         `nota` VARCHAR(255) DEFAULT NULL,
+         `created_by` VARCHAR(8) DEFAULT NULL
+         `estado` BOOLEAN DEFAULT FALSE DEFAULT NULL,
          `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
          `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
          FOREIGN KEY (expediente) REFERENCES pacientes (expediente)
