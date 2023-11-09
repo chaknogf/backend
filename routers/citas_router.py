@@ -20,12 +20,13 @@ now = datetime.now()
 
 class Citas(BaseModel):
     id: int
-    fecha: date
-    expediente: int
-    especialidad: int
+    fecha: date | None = None
+    expediente: int | None = None
+    especialidad: int  | None = None
     cirugia_programada: date | None = None
     nota: str | None = None
-    estado: bool
+    estado: bool | None = None
+    created_by: str | None = None
 
 hoy = date.today()
 
@@ -135,7 +136,8 @@ async def actualizar_cita(cita: Citas, id: int):
             return JSONResponse(status_code=404, content={"message": "No encontrado"})
         result.nota = cita.nota
         result.estado = cita.estado
-        result.cirugía_programada = cita.cirugia_programada
+        result.cirugia_programada = cita.cirugia_programada
+        result.created_by = cita.created_by
         Db.commit()
         return JSONResponse(status_code=201, content={"message": "Actualización realizada"})
     except SQLAlchemyError as error:

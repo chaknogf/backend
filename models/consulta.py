@@ -32,12 +32,13 @@ Tconsultas = ('''
               `fecha_egreso` DATE DEFAULT NULL,
               `fecha_recepcion`DATETIME DEFAULT NULL,
               `tipo_consulta` INT DEFAULT NULL,
+              `created_by` VARCHAR(8) DEFAULT NULL,
               `prenatal` INT DEFAULT NULL,
               `lactancia` INT DEFAULT NULL,
               `dx` VARCHAR(100) DEFAULT NULL,
               `folios` INT DEFAULT NULL,
               `medico` INT DEFAULT NULL,
-              `archiva` INT DEFAULT NULL,
+              `archived_by` VARCHAR(8) DEFAULT NULL,
               `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
               `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
               FOREIGN KEY (expediente) REFERENCES pacientes (expediente)
@@ -110,7 +111,8 @@ class ConsultasModel(Base):
     dx = Column(String(100))
     folios = Column(Integer)
     medico = Column(Integer)
-    archiva = Column(Integer)
+    archived_by = Column(String(8))
+    created_by = Column(String(8))
    
     
     

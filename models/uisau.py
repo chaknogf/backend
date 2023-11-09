@@ -32,7 +32,7 @@ Tuisau = ('''
     `estudios` VARCHAR(255) DEFAULT NULL,
     `evolucion` TEXT DEFAULT NULL,
     `id_consulta` INT DEFAULT NULL,
-    `Usuario` INT DEFAULT NULL,
+    `created_by` VARCHAR(8) DEFAULT NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB CHARSET=utf8mb4
@@ -79,7 +79,7 @@ class uisauModel(Base):
     estudios = Column(Text)
     evolucion = Column(Text)
     id_consulta = Column(Integer)
-    Usuario = Column(Integer)
+    created_by = Column(String(8))
    
  # Establece la relación con la tabla de pacientes
   #  pacientes = relationship("PacienteModel", back_populates="uisau")

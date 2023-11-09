@@ -84,6 +84,7 @@ class CitasModel(Base):
     cirugia_programada = Column(Date)
     nota = Column(String(255)) 
     estado = Column(Boolean, default=False)
+    created_by = Column(String(8))
     
  # Establece la relación con la tabla de pacientes
     pacientes = relationship("PacienteModel", back_populates="citas")

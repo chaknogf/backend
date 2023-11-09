@@ -37,7 +37,7 @@ class uisau(BaseModel):
     estudios: str | None = None
     evolucion: str | None = None
     id_consulta: int | None = None
-    Usuario: int | None = None
+    created_by: str | None = None
     
     
 bModel = uisauModel
@@ -138,7 +138,7 @@ async def filtro(
         return {"error": str(e)}    
   
     #Post conectado a SQL
-@router.post("/consultas/",response_model=uisau, tags=["UISAU"])
+@router.post("/uisausave/", tags=["UISAU"])
 async def crear(data: uisau ):
     try:
         db = Session()
@@ -152,3 +152,34 @@ async def crear(data: uisau ):
          return {"message": f"error al crear consulta: {error}"}
     finally:
         cursor.close()
+
+
+@router.put("/uisauedit", tags=["UISAU"])
+async def editar(edit: uisau, id: int):
+    try:
+        db = Session()
+        result = db.query(uisauModel).filter(uisauModel.id == id).first()
+        if not result:
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        result.expediente = edit.expediente
+        db.commit()
+        return JSONResponse(status_code=201, content={"message": "Actualizacion realizada"})
+    except SQLAlchemyError as error:
+        return {"message": f"Error al actualizar la cita: {error}"}
+    finally:
+        db.close()
+        
+@router.delete("/uisaudelet/{id}",  tags=["UISAU"])
+async def eliminar_cita(id: int):
+    try:
+        db = Session()
+        result = db.query(uisauModel).filter(uisauModel.id == id).first()
+        if not result:
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        db.delete(result)
+        db.commit()
+        return JSONResponse(status_code=200, content={"message": "Eliminado con exito"})
+    except SQLAlchemyError as error:
+        return {"message": f"Error al consultar cita: {error}"}
+    finally:
+           db.close()

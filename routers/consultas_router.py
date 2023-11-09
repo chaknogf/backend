@@ -45,7 +45,8 @@ class Consultas(BaseModel):
     dx: str | None = None
     folios: int | None = None
     medico: int | None = None
-    archiva: int | None = None
+    archived_by: str | None = None
+    created_by: str | None = None
    
     
 
@@ -416,8 +417,9 @@ async def actualizar( consulta: Consultas, id: int):
         result.prenatal = consulta.prenatal
         result.lactancia = consulta.lactancia
         result.dx = consulta.dx
-        result.archiva = consulta.archiva
         result.folios = consulta.folios
+        result.created_by = consulta.created_by
+        result.archived_by = consulta.archived_by
     
         db.commit()
         return JSONResponse(status_code=201, content={"message": "Actualización Realizada"})
