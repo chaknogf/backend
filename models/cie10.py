@@ -40,7 +40,7 @@ def crear_tabla():
             
 #Definición del modelo de datos            
 class Cie10Model(Base):
-    __tablename__ = "medicos"
+    __tablename__ = "cie10"
     id = Column(Integer, primary_key=True)
     cod = Column(String(7))
     grupo = Column(String(1))

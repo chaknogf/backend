@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Form
+from fastapi import APIRouter, HTTPException, Depends, Form, Query
 from pydantic import BaseModel
 from typing import List
 from datetime import date, datetime, time
@@ -110,3 +110,38 @@ async def eliminar(id: int):
         return {"message": f"Error al consultar: {error}"}
     finally:
            cursor.close()
+ 
+@router.get("/filtrarcie10/", tags=["cie10"])
+async def filtro(
+    cod: str = Query(None, description="Codigo de cie-10"),
+    grupo: str = Query(None, description="Grupo"),
+    dx: str = Query(None, description="Diagnostico"),
+    abreviatura: str = Query(None, description="Abreviatura"),
+    especialidad: int = Query(None, description="especialidad")
+   ):
+    try:
+        
+        db = Session()
+        query = db.query(Cie10Model)
+
+            
+        if cod:
+            query = query.filter(Cie10Model.cod.ilike(f"%{cod}%"))
+
+        if grupo is not None:
+            query = query.filter(Cie10Model.grupo == grupo)
+
+        if dx:
+            query = query.filter(Cie10Model.dx.ilike(f"%{dx}%"))
+
+        if abreviatura:
+            query = query.filter(Cie10Model.abreviatura.ilike(f"%{abreviatura}%"))
+
+        if especialidad is not None:
+            query = query.filter(Cie10Model.especialidad == especialidad)
+
+        
+        result = query.all()
+        return result
+    except Exception as e:
+        return {"error": str(e)}  
