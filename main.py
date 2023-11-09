@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from middlewares.error_hendler import ErrorHandler
 from login_router import router as login_router
 from auth import decode_token, verify_token
-from routers import citas_router, consultas_router, municipio, paciente_router, pandas, uisau_router, usuarios_router, medicos_router
+from routers import citas_router, consultas_router, municipio, paciente_router, pandas, uisau_router, usuarios_router, medicos_router, cie10_router
 import jwt
 
 
@@ -38,6 +38,7 @@ app.include_router(pandas.router, dependencies=[Depends(check_jwt_token)])
 app.include_router(uisau_router.router, dependencies=[Depends(check_jwt_token)])
 app.include_router(usuarios_router.router, dependencies=[Depends(check_jwt_token)])
 app.include_router(medicos_router.router, dependencies=[Depends(check_jwt_token)])
+app.include_router(cie10_router.router, dependencies=[Depends(check_jwt_token)])
 
 # # Define una ruta protegida
 # @app.get("/ruta-protegida", tags=["ruta protegida"], dependencies=[Depends(check_jwt_token)])
