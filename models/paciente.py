@@ -27,6 +27,8 @@ Tpacientes = ('''
   `idioma` int DEFAULT NULL,
   `ocupacion` varchar(50) DEFAULT NULL,
   `direccion` varchar(100) DEFAULT NULL,
+  `municipio` int DEFAULT NULL,
+  `depto` int DEFAULT NULL,
   `telefono` varchar(50) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
   `padre` varchar(50) DEFAULT NULL,
@@ -97,6 +99,8 @@ class PacienteModel(Base):
     pueblo= Column(Integer)
     idioma = Column(Integer)
     ocupacion = Column(String(50))
+    municipio = Column(Integer)
+    depto = Column(Integer)
     direccion = Column(String(100))
     telefono = Column(String(50))
     email = Column(String(100))
@@ -110,8 +114,7 @@ class PacienteModel(Base):
     exp_madre = Column(Integer)
     created_by = Column(String(8))
     fechaDefuncion = Column(String(10))
-    created_at = Column(String(50))
-    update_at = Column(String(50))
+    
    
 # Configura la relación con la tabla de citas
     citas = relationship("CitasModel", back_populates="pacientes")

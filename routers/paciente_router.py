@@ -59,13 +59,15 @@ class Paciente(BaseModel):
     pasaporte: str | None = None
     sexo: GeneroEnum | None = None
     nacimiento: date | None = None
-    nacionalidad: int = 1
+    nacionalidad: int| None = None
     lugar_nacimiento: int | None = None
     estado_civil: int | None = None
     educacion: int | None = None
     pueblo: int | None = None
     idioma: int | None = None
     ocupacion: str | None = None
+    municipio: int | None = None
+    depto: int | None = None
     direccion: str | None = None
     telefono: str | None = None
     email: EmailStr | None = None
@@ -79,10 +81,11 @@ class Paciente(BaseModel):
     exp_madre: int | None = None
     created_by: str | None = None
     fechaDefuncion: str | None = None
+    
+    
+class Created ( Paciente):
     created_at: str | None = None
     updated_at: str  | None = None
-    
-
 
     
 #Get conectado a SQL
@@ -198,6 +201,8 @@ async def actualizar_paciente( Pacient: Paciente, exp: int):
         result.idioma = Pacient.idioma
         result.ocupacion = Pacient.ocupacion
         result.direccion = Pacient.direccion
+        result.municipio = Pacient.municipio
+        result.depto = Pacient.depto
         result.telefono = Pacient.telefono
         result.email = Pacient.email
         result.padre = Pacient.padre
@@ -210,7 +215,7 @@ async def actualizar_paciente( Pacient: Paciente, exp: int):
         result.exp_madre = Pacient.exp_madre
         result.created_by = Pacient.created_by
         result.fechaDefuncion = Pacient.fechaDefuncion
-        result.update_at = Pacient.updated_at
+        
         
       
         Db.commit()
