@@ -113,6 +113,8 @@ class ConsultasModel(Base):
     medico = Column(Integer)
     archived_by = Column(String(8))
     created_by = Column(String(8))
+    created_at = Column(String(50))
+    updated_at= Column(String(50))
    
     
     

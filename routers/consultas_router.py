@@ -47,6 +47,8 @@ class Consultas(BaseModel):
     medico: int | None = None
     archived_by: str | None = None
     created_by: str | None = None
+    created_at: str  | None = None
+    updated_at: str | None = None
    
     
 
@@ -75,7 +77,9 @@ async def filtro(
     dpi: str = Query(None, description="DPI"),
     fecha_egreso: str = Query(None, description="Fecha de Egreso"),
     tipo_consulta: int = Query(None, description="Tipo de consulta"),
-    status: int = Query(None, description="status")
+    status: int = Query(None, description="status"),
+    fecha_recepcion: str = Query(None, description="fecha recepcion"),
+    no_es: int =Query(None, description="No es consulta"),
     
                 ):
     try:
@@ -110,7 +114,13 @@ async def filtro(
             
         if tipo_consulta:
             query = query.filter(ConsultasModel.tipo_consulta == tipo_consulta)
-
+            
+        if  no_es:
+            query = query.filter(ConsultasModel.tipo_consulta != no_es)
+            
+        if fecha_recepcion:
+            query = query.filter(func.DATE_FORMAT(ConsultasModel.fecha_recepcion, '%Y-%m-%d').ilike(f"%{fecha_recepcion}%"))
+            
         if status:
             query = query.filter(ConsultasModel.status == status)
 
@@ -420,6 +430,7 @@ async def actualizar( consulta: Consultas, id: int):
         result.folios = consulta.folios
         result.created_by = consulta.created_by
         result.archived_by = consulta.archived_by
+        result.updated_at = consulta.updated_at
     
         db.commit()
         return JSONResponse(status_code=201, content={"message": "Actualización Realizada"})

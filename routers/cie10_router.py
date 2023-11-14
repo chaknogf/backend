@@ -42,7 +42,7 @@ async def obtener_dxs():
 async def obtener_dx(id: int):
     try:
         db = Session()
-        result = db.query.filter(Cie10Model.id == id).first()
+        result = db.query(Cie10Model).filter(Cie10Model.id == id).first()
         return JSONResponse(status_code=200, content=jsonable_encoder(result))
     except SQLAlchemyError as error:
         return {"message": f"error al consultar: {error}"}
@@ -85,6 +85,7 @@ async def actualizar( cie10: Cie10, id: int):
         result.grupo = cie10.grupo
         result.dx = cie10.dx
         result.especialidad = cie10.especialidad
+        result.abreviatura = cie10.abreviatura
         
         db.commit()
         return JSONResponse(status_code=201, content={"message": "Actualización Realizada"})

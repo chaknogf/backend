@@ -79,6 +79,8 @@ class Paciente(BaseModel):
     exp_madre: int | None = None
     created_by: str | None = None
     fechaDefuncion: str | None = None
+    created_at: str | None = None
+    updated_at: str  | None = None
     
 
 
@@ -107,7 +109,7 @@ def retornar_pacientes():
 async def obtener_paciente(exp: int):
     try:
         db = Session()
-        result = db.query(VistaPaciente).filter(VistaPaciente.expediente == exp).first()
+        result = db.query(PacienteModel).filter(PacienteModel.expediente == exp).first()
         if not result:
             return JSONResponse(status_code=404, content={"message": "No encontrado"})
         return JSONResponse(status_code=200, content=jsonable_encoder(result))
@@ -208,6 +210,7 @@ async def actualizar_paciente( Pacient: Paciente, exp: int):
         result.exp_madre = Pacient.exp_madre
         result.created_by = Pacient.created_by
         result.fechaDefuncion = Pacient.fechaDefuncion
+        result.update_at = Pacient.updated_at
         
       
         Db.commit()

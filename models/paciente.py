@@ -110,6 +110,8 @@ class PacienteModel(Base):
     exp_madre = Column(Integer)
     created_by = Column(String(8))
     fechaDefuncion = Column(String(10))
+    created_at = Column(String(50))
+    update_at = Column(String(50))
    
 # Configura la relación con la tabla de citas
     citas = relationship("CitasModel", back_populates="pacientes")
