@@ -431,7 +431,7 @@ async def actualizar( consulta: Consultas, id: int):
         result.folios = consulta.folios
         result.created_by = consulta.created_by
         result.archived_by = consulta.archived_by
-        result.updated_at = consulta.updated_at
+        
     
         db.commit()
         return JSONResponse(status_code=201, content={"message": "Actualización Realizada"})
