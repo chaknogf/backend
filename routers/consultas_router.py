@@ -44,7 +44,7 @@ class Consultas(BaseModel):
     lactancia: int | None = None
     dx: str | None = None
     folios: int | None = None
-    medico: int | None = None
+    medico: str | None = None
     archived_by: str | None = None
     created_by: str | None = None
     

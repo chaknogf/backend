@@ -110,7 +110,7 @@ class ConsultasModel(Base):
     lactancia = Column(Integer)
     dx = Column(String(100))
     folios = Column(Integer)
-    medico = Column(Integer)
+    medico = Column(String(25))
     archived_by = Column(String(8))
     created_by = Column(String(8))
     
