@@ -304,9 +304,6 @@ def buscar_nombre(nombre: str = Query(None, title="Nombre a buscar"),
         print(f"id: {id} datetime:{now} CONSULTADO")
 
 
-
-
-
 #Funcion para obtener tiempo ahora
 now = datetime.now()
 
