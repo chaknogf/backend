@@ -18,16 +18,16 @@ Tuisau = ('''
     `estado` INT DEFAULT NULL,
     `situacion` INT DEFAULT NULL,
     `lugar_referencia` INT DEFAULT NULL,
-    `fecha_referencia` DATETIME DEFAULT NULL,
+    `fecha_referencia` DATE DEFAULT NULL,
     `estadia` INT DEFAULT NULL,
     `cama` INT DEFAULT NULL,
     `especialidad` INT DEFAULT NULL,
     `servicio` INT DEFAULT NULL,
-    `informacion` BOOLEAN DEFAULT NULL,
+    `informacion` VARCHAR(2) DEFAULT NULL,
     `contacto` VARCHAR(255) DEFAULT NULL,
     `parentesco` INT DEFAULT NULL,
     `telefono` INT DEFAULT NULL,
-    `fecha` DATE DEFAULT NULL,
+    `fecha` VARCHAR(22) DEFAULT NULL,
     `nota` TEXT DEFAULT NULL,
     `estudios` VARCHAR(255) DEFAULT NULL,
     `evolucion` TEXT DEFAULT NULL,
@@ -65,16 +65,16 @@ class uisauModel(Base):
     estado = Column(Integer)
     situacion = Column(Integer)
     lugar_referencia = Column(Integer)
-    fecha_referencia = Column(DateTime)
+    fecha_referencia = Column(Date)
     estadia = Column(Integer)
     cama = Column(Integer)
     especialidad = Column(Integer)
     servicio = Column(Integer)
-    informacion = Column(Boolean)
+    informacion = Column(String(2))
     contacto = Column(String(100))
     parentesco = Column(Integer)
     telefono = Column(Integer)
-    fecha = Column(DateTime)
+    fecha = Column(String(22))
     nota = Column(Text)
     estudios = Column(Text)
     evolucion = Column(Text)

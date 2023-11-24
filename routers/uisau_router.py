@@ -23,16 +23,16 @@ class uisau(BaseModel):
     estado: int | None = None
     situacion: int | None = None
     lugar_referencia: int | None = None
-    fecha_referencia: datetime | None = None
+    fecha_referencia: date | None = None
     estadia: int | None = None
     cama: int | None = None
     especialidad: int | None = None
     servicio: int | None = None
-    informacion: bool | None = None
+    informacion: str | None = None
     contacto: str | None = None
     parentesco: int | None = None
     telefono: int | None = None
-    fecha: datetime | None = None
+    fecha: str | None = None
     nota: str | None = None
     estudios: str | None = None
     evolucion: str | None = None
@@ -68,11 +68,11 @@ def buscar_id(id: int):
     finally:
         print(f"id: {id} datetime:{now} CONSULTADO")
         
-@router.get("/registros/", tags=["UISAU"])
-def buscar_id(id_consulta: int):
+@router.get("/infos/", tags=["UISAU"])
+def buscar_id(consulta: int):
     try:
         db = Session()
-        result = db.query(bModel).filter(uisauModel.id_consulta == id_consulta).all()
+        result = db.query(bModel).filter(uisauModel.id_consulta == consulta).all()
         if not result:
             return JSONResponse(status_code=404, content={"message": "No encontrado"})
         return JSONResponse(status_code=200, content=jsonable_encoder(result))
@@ -84,6 +84,7 @@ def buscar_id(id_consulta: int):
 
 @router.get("/filter/", tags=["UISAU"])
 async def filtro(
+    id: int = Query(None, description="Id"),
     id_consulta: int = Query(None, description="Número de id de consulta"),
     expediente: int = Query(None, description="Número de Expediente"),
     estado: int = Query(None, description="Estado del Paciente"),
@@ -103,12 +104,15 @@ async def filtro(
 
         # Agregar condiciones para los filtros con coincidencias parciales
         if id is not None:
+            query = query.filter(bModel.id == id)
+            
+        if id_consulta is not None:
             query = query.filter(bModel.id_consulta == id_consulta)
             
         if estado:
             query = query.filter(bModel.estado == estado)
 
-        if expediente is not None:
+        if expediente:
             query = query.filter(bModel.expediente == expediente)
 
         if fecha:
@@ -138,6 +142,7 @@ async def filtro(
         return {"error": str(e)}    
   
     #Post conectado a SQL
+
 @router.post("/uisausave/", tags=["UISAU"])
 async def crear(data: uisau ):
     try:
