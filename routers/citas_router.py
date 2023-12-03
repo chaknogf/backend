@@ -22,6 +22,7 @@ class Citas(BaseModel):
     id: int
     fecha: date | None = None
     expediente: int | None = None
+    paciente_n: str | None = None
     especialidad: int  | None = None
     cirugia_programada: date | None = None
     nota: str | None = None
@@ -138,6 +139,7 @@ async def actualizar_cita(cita: Citas, id: int):
         result.estado = cita.estado
         result.cirugia_programada = cita.cirugia_programada
         result.created_by = cita.created_by
+        result.paciente_n = cita.paciente_n
         Db.commit()
         return JSONResponse(status_code=201, content={"message": "Actualización realizada"})
     except SQLAlchemyError as error:
