@@ -33,11 +33,15 @@ class uisau(BaseModel):
     parentesco: int | None = None
     telefono: int | None = None
     fecha: str | None = None
+    hora: str | None = None
+    fecha_contacto: str | None = None
+    hora_contacto: str | None = None
     nota: str | None = None
     estudios: str | None = None
     evolucion: str | None = None
     id_consulta: int | None = None
     created_by: str | None = None
+    update_by: str | None = None
     
     
 bModel = uisauModel
@@ -166,7 +170,14 @@ async def editar(edit: uisau, id: int):
         result = db.query(uisauModel).filter(uisauModel.id == id).first()
         if not result:
             return JSONResponse(status_code=404, content={"message": "No encontrado"})
-        result.expediente = edit.expediente
+        result.parentesco = edit.parentesco
+        result.fecha_contacto = edit.fecha_contacto
+        result.hora_contacto = edit.hora_contacto
+        result.update_by = edit.update_by
+        result.contacto = edit.contacto
+        result.telefono = edit.telefono
+        result.informacion = edit.informacion
+        result.nota = edit.nota
         db.commit()
         return JSONResponse(status_code=201, content={"message": "Actualizacion realizada"})
     except SQLAlchemyError as error:

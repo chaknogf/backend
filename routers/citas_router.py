@@ -22,7 +22,6 @@ class Citas(BaseModel):
     id: int
     fecha: date | None = None
     expediente: int | None = None
-    paciente_n: str | None = None
     especialidad: int  | None = None
     cirugia_programada: date | None = None
     nota: str | None = None
@@ -30,6 +29,8 @@ class Citas(BaseModel):
     created_by: str | None = None
 
 hoy = date.today()
+# Convertir el objeto date a una cadena de texto con formato "YYYY-MM-DD"
+cadena_fecha = hoy.strftime("%Y-%m-%d")
 
 
 #Get conectado a SQL
@@ -139,7 +140,6 @@ async def actualizar_cita(cita: Citas, id: int):
         result.estado = cita.estado
         result.cirugia_programada = cita.cirugia_programada
         result.created_by = cita.created_by
-        result.paciente_n = cita.paciente_n
         Db.commit()
         return JSONResponse(status_code=201, content={"message": "Actualización realizada"})
     except SQLAlchemyError as error:
@@ -308,3 +308,49 @@ def tablaCitas(data: str, especialidad: int):
         raise HTTPException(status_code=500, detail=f"Error al consultar paciente: {error}")
     finally:
         db.close()    
+        
+        
+@router.get("/citasVigentes", tags=["Citas"])
+def Vigentes(especialidad: int):
+    try:
+        db = Session()
+         # Consulta la vista filtrando por especialidad
+        citas = db.query(VistaCitas).filter(VistaCitas.dia >= cadena_fecha, VistaCitas.especialidad == especialidad).all()
+        
+        
+        if not citas:
+            raise HTTPException(status_code=404, detail="No se encontraron citas para esta especialidad.")
+        
+        citas_dict = [{"id": cita.id, "especialidad": cita.especialidad, "dia": cita.dia, "total_citas": cita.total_citas} for cita in citas]
+    
+        return JSONResponse(status_code=200, content=citas_dict)
+    except SQLAlchemyError as error:
+        raise HTTPException(status_code=500, detail=f"Error al consultar citas: {error}")
+    finally:
+        db.close()
+        
+@router.get("/citashoy/", tags=["Citas"])
+def buscar_fecha():
+    try:
+        db = Session()
+        result = (
+            db.query(CitasModel,(PacienteModel.nombre).label("nombres"), (PacienteModel.apellido).label("apellidos"))
+            .join(CitasModel.pacientes)
+            .filter(CitasModel.fecha == hoy)
+            .all()
+        )
+        
+        if not result:
+            raise HTTPException(status_code=404, detail="No hay citas registrasdas para esta fecha")
+        
+        cita_dict = [
+            {**cita.__dict__, "nombres": nombres, "apellidos": apellidos} for cita, nombres, apellidos in result
+        ]
+        
+        
+        return JSONResponse(status_code=200, content=jsonable_encoder(cita_dict))
+    except SQLAlchemyError as error:
+        raise HTTPException(status_code=500, detail=f"Error al consultar paciente: {error}")
+    finally:
+        db.close()
+        

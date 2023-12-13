@@ -19,6 +19,8 @@ Tuisau = ('''
     `situacion` INT DEFAULT NULL,
     `lugar_referencia` INT DEFAULT NULL,
     `fecha_referencia` DATE DEFAULT NULL,
+    `fecha_contacto` DATE DEFAULT NULL,
+    `hora_contacto` TIME DEFAULT NULL,
     `estadia` INT DEFAULT NULL,
     `cama` INT DEFAULT NULL,
     `especialidad` INT DEFAULT NULL,
@@ -27,12 +29,14 @@ Tuisau = ('''
     `contacto` VARCHAR(255) DEFAULT NULL,
     `parentesco` INT DEFAULT NULL,
     `telefono` INT DEFAULT NULL,
-    `fecha` VARCHAR(22) DEFAULT NULL,
+    `fecha` DATE DEFAULT NULL,
+    `hora` TIME DEFAULT NULL,
     `nota` TEXT DEFAULT NULL,
     `estudios` VARCHAR(255) DEFAULT NULL,
     `evolucion` TEXT DEFAULT NULL,
     `id_consulta` INT DEFAULT NULL,
     `created_by` VARCHAR(8) DEFAULT NULL,
+    `update_by` VARCHAR(8) DEFAULT NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB CHARSET=utf8mb4
@@ -74,12 +78,16 @@ class uisauModel(Base):
     contacto = Column(String(100))
     parentesco = Column(Integer)
     telefono = Column(Integer)
-    fecha = Column(String(22))
+    fecha = Column(Date)
+    hora = Column(Time)
+    fecha_contacto = Column(Date)
+    hora_contacto = Column(Time)
     nota = Column(Text)
     estudios = Column(Text)
     evolucion = Column(Text)
     id_consulta = Column(Integer)
     created_by = Column(String(8))
+    update_by = Column(String(8))
    
  # Establece la relación con la tabla de pacientes
   #  pacientes = relationship("PacienteModel", back_populates="uisau")

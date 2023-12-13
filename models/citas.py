@@ -96,6 +96,6 @@ class VistaCitas(Base):
     especialidad = Column(Integer)
     dia = Column(String)
     total_citas = Column(Integer)
-    
+     
     
    
