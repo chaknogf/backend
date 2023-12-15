@@ -88,6 +88,8 @@ class uisauModel(Base):
     id_consulta = Column(Integer)
     created_by = Column(String(8))
     update_by = Column(String(8))
+    # created_at = Column(String(25))
+    # updated_at = Column(String(25))
    
  # Establece la relación con la tabla de pacientes
   #  pacientes = relationship("PacienteModel", back_populates="uisau")

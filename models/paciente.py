@@ -114,6 +114,8 @@ class PacienteModel(Base):
     exp_madre = Column(Integer)
     created_by = Column(String(8))
     fechaDefuncion = Column(String(10))
+    # created_at = Column(String(25))
+    # update_at = Column(String(25))
     
    
 # Configura la relación con la tabla de citas

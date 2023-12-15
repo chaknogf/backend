@@ -134,27 +134,34 @@ async def filtro(
 async def buscarId(id: int):
     try:
         db = Session()
-        result = (
-            db.query(ConsultasModel,(PacienteModel.nombre).label("name"), (PacienteModel.apellido).label("lastname"))
-            .join(ConsultasModel.pacientes)
-            .filter(ConsultasModel.id == id)
-            .first()
-        )
+        result = db.query(ConsultasModel)
         
+        result = db.query(ConsultasModel).filter(ConsultasModel.id == id).first()
         if not result:
-            raise HTTPException(status_code=404, detail="No encontrado")
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
         
-        consulta, name, lastname = result  # Desempaquetar la tupla
+    
         
+        consulta = result  # Desempaquetar la tupla
+
+        # Obtener los valores de created_at y updated_at
+        created_at = consulta.created_at
+        updated_at = consulta.updated_at
+
+        # Convertir las fechas a un formato adecuado si es necesario
+        created_at_str = created_at.strftime("%Y-%m-%d %H:%M:%S") if created_at else None
+        updated_at_str = updated_at.strftime("%Y-%m-%d %H:%M:%S") if updated_at else None
+
+        # Agregar created_at y updated_at al diccionario de resultados
         consulta_dict = consulta.__dict__
-        consulta_dict["name"] = name
-        consulta_dict["lastname"] = lastname
         
-        print(f"expediente: {id} datetime: {now} CONSULTADO")
+        consulta_dict["created_at"] = created_at_str
+        consulta_dict["updated_at"] = updated_at_str
+
         return JSONResponse(status_code=200, content=jsonable_encoder(consulta_dict))
     except SQLAlchemyError as error:
         raise HTTPException(status_code=500, detail=f"Error al consultar: {error}")
-    finally:
+    finally: 
         db.close()
 
 @router.get("/consulta/servicio/", tags=["Consultas"])

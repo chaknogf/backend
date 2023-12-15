@@ -83,9 +83,6 @@ class Paciente(BaseModel):
     fechaDefuncion: str | None = None
     
     
-class Created ( Paciente):
-    created_at: str | None = None
-    updated_at: str  | None = None
 
     
 #Get conectado a SQL
@@ -279,6 +276,23 @@ def buscar_id(id: int):
         result = db.query(PacienteModel).filter(PacienteModel.id == id).first()
         if not result:
             return JSONResponse(status_code=404, content={"message": "No encontrado"})
+       
+        # consulta = result
+       
+        # # Obtener los valores de created_at y updated_at
+        # created_at = consulta.created_at
+        # update_at = consulta.update_at
+
+        # # Convertir las fechas a un formato adecuado si es necesario
+        # created_at_str = created_at.strftime("%Y-%m-%d %H:%M:%S") if created_at else None
+        # update_at_str = update_at.strftime("%Y-%m-%d %H:%M:%S") if update_at else None
+
+        # # Agregar created_at y updated_at al diccionario de resultados
+        # consulta_dict = consulta.__dict__
+       
+        # consulta_dict["created_at"] = created_at_str
+        # consulta_dict["update_at"] = update_at_str
+
         return JSONResponse(status_code=200, content=jsonable_encoder(result))
     except SQLAlchemyError as error:
         return {"message": f"Error al consultar paciente: {error}"}

@@ -42,6 +42,7 @@ class uisau(BaseModel):
     id_consulta: int | None = None
     created_by: str | None = None
     update_by: str | None = None
+   
     
     
 bModel = uisauModel
