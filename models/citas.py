@@ -12,18 +12,20 @@ db = database.get_database_connection()
 now = datetime.now()
 
 Tcitas = ('''
-          CREATE TABLE IF NOT EXISTS citas (
-         `id` INT AUTO_INCREMENT PRIMARY KEY,
-         `fecha` DATE DEFAULT NULL,
-         `expediente` INT DEFAULT NULL,
-         `especialidad` INT DEFAULT NULL,
-         `cirugia_programada` DATE DEFAULT NULL,
-         `nota` VARCHAR(255) DEFAULT NULL,
-         `created_by` VARCHAR(8) DEFAULT NULL
-         `estado` BOOLEAN DEFAULT FALSE DEFAULT NULL,
-         `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-         `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-         FOREIGN KEY (expediente) REFERENCES pacientes (expediente)
+          CREATE TABLE `citas` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `fecha` date DEFAULT NULL,
+  `expediente` int DEFAULT NULL,
+  `especialidad` int DEFAULT NULL,
+  `cirugia_programada` date DEFAULT NULL,
+  `nota` varchar(255) DEFAULT NULL,
+  `estado` tinyint(1) DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_by` varchar(8) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `expediente` (`expediente`),
+  CONSTRAINT `citas_ibfk_1` FOREIGN KEY (`expediente`) REFERENCES `pacientes` (`expediente`)
      )   ENGINE=InnoDB CHARSET=utf8mb4
           
           ''')

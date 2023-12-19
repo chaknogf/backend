@@ -251,20 +251,20 @@ def buscar_paciente(expe: int):
         adicional = municipio(result.lugar_nacimiento)
         if not result:
             return JSONResponse(status_code=404, content={"message": "No encontrado"})
-         # Crear el diccionario adicional con la información extra
-        adicional = {
-            "municipio": municipio(result.lugar_nacimiento),
-            "nation": Desc_nacionalidad(result.nacionalidad),
-            "people": Desc_people(result.pueblo),
-            "ecivil": Desc_Civil(result.estado_civil),
-            "academic": Desc_educacion(result.educacion),
-            "parents": Desc_parentesco(result.parentesco),
-            "lenguage": Desc_idiomas(result.idioma)
+        #  # Crear el diccionario adicional con la información extra
+        # adicional = {
+        #     "municipio": municipio(result.lugar_nacimiento),
+        #     "nation": Desc_nacionalidad(result.nacionalidad),
+        #     "people": Desc_people(result.pueblo),
+        #     "ecivil": Desc_Civil(result.estado_civil),
+        #     "academic": Desc_educacion(result.educacion),
+        #     "parents": Desc_parentesco(result.parentesco),
+        #     "lenguage": Desc_idiomas(result.idioma)
                      
-            }
+        #     }
          # Combinar los datos del paciente con la información adicional
-        response_data = {**jsonable_encoder(result), **adicional}
-        return JSONResponse(status_code=200, content=jsonable_encoder(response_data))
+        # response_data = {**jsonable_encoder(result), **adicional}
+        return JSONResponse(status_code=200, content=jsonable_encoder(result))
     except SQLAlchemyError as error:
         return {"message": f"Error al consultar paciente: {error}"}
     finally:
