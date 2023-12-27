@@ -8,8 +8,9 @@ from models.consulta import ConsultasModel, VistaConsultas
 from models.paciente import PacienteModel
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy import func, select
+from sqlalchemy import func, select, desc
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import lazyload
 
 router = APIRouter()
 db = database.get_database_connection()
@@ -349,6 +350,28 @@ async def consult(tipo: int):
         raise HTTPException(status_code=500, detail=f"Error al consultar: {error}")
     finally:
         db.close()
+
+@router.get("/emerg/", tags=["Consultas"])
+async def consult_3():
+    try:
+        with Session() as db:
+            result = (
+                db.query(ConsultasModel)
+                .filter(ConsultasModel.tipo_consulta == 3)
+                .order_by(desc(ConsultasModel.id))  # Ordena por id en orden descendente
+                .limit(10000)  # Ajusta el límite según tus necesidades
+                .options(lazyload('*'))  # Si es necesario cargar relaciones de manera diferida
+                .all()
+            )
+
+            if not result:
+                return JSONResponse(status_code=200, content=jsonable_encoder([]))
+
+            return result
+
+    except SQLAlchemyError as error:
+        raise HTTPException(status_code=500, detail=f"Error al consultar: {error}")
+
                 
  
 #       #Post conectado a SQL

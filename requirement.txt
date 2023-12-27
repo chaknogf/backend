@@ -34,3 +34,4 @@ typing_extensions==4.7.1
 tzdata==2023.3
 uvicorn==0.23.2
 websockets==11.0.3
+PyJWT==1.7.1
