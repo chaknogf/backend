@@ -169,27 +169,25 @@ async def consultas(fecha: str, tipo: int):
     try: 
         db = Session()
         NoEncontrado = []
+        
         result = (
-            db.query(ConsultasModel, PacienteModel.nombre, PacienteModel.apellido)
-            .join(ConsultasModel.pacientes)
+            db.query(ConsultasModel)
             .filter(ConsultasModel.fecha_consulta == fecha, ConsultasModel.tipo_consulta == tipo)
         ).all()
         
         if not result:
             return JSONResponse(status_code=200, content=jsonable_encoder(NoEncontrado))
 
-        consulta, name, lastname = result[0]  # Desempaquetar la tupla
-        
+        consulta = result[0]  # Desempaquetar la tupla
         consulta_dict = consulta.__dict__
-        consulta_dict["name"] = name
-        consulta_dict["lastname"] = lastname
-        
+
         print(f"expediente: {consulta.id} datetime: {now} CONSULTADO")
         return JSONResponse(status_code=200, content=jsonable_encoder(consulta_dict))
     except SQLAlchemyError as error:
         raise HTTPException(status_code=500, detail=f"Error al consultar: {error}")
     finally:
         db.close()
+
 
         
 @router.get("/consultando/", tags=["Consultas"])

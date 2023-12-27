@@ -12,21 +12,20 @@ db = database.get_database_connection()
 now = datetime.now()
 
 Tcitas = ('''
-          CREATE TABLE IF NOT EXISTS citas (
-         `id` INT AUTO_INCREMENT PRIMARY KEY,
-         `fecha` DATE DEFAULT NULL,
-         `expediente` INT DEFAULT NULL,
-         `especialidad` INT DEFAULT NULL,
-         `cirugia_programada` DATE DEFAULT NULL,
-         `nota` VARCHAR(255) DEFAULT NULL,
-         `created_by` VARCHAR(8) DEFAULT NULL
-         `estado` BOOLEAN DEFAULT FALSE DEFAULT NULL,
-         `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-         `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-         FOREIGN KEY (expediente) REFERENCES pacientes (expediente)
-     )   ENGINE=InnoDB CHARSET=utf8mb4
-          
-          ''')
+    CREATE TABLE IF NOT EXISTS citas (
+        `id` INT AUTO_INCREMENT PRIMARY KEY,
+        `fecha` DATE DEFAULT NULL,
+        `expediente` INT DEFAULT NULL,
+        `especialidad` INT DEFAULT NULL,
+        `cirugia_programada` DATE DEFAULT NULL,
+        `nota` VARCHAR(255) DEFAULT NULL,
+        `created_by` VARCHAR(8) DEFAULT NULL
+        `estado` BOOLEAN DEFAULT FALSE DEFAULT NULL,
+        `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB CHARSET=utf8mb4
+''')
+
 
 tabla_sql = Tcitas
 
@@ -79,12 +78,13 @@ class CitasModel(Base):
     
     id = Column(Integer, primary_key=True)
     fecha = Column(Date)
-    expediente = Column(Integer,ForeignKey('pacientes.expediente'))
+    expediente = Column(Integer)  # Elimina ForeignKey('pacientes.expediente')
     especialidad = Column(Integer)
     cirugia_programada = Column(Date)
     nota = Column(String(255)) 
     estado = Column(Boolean, default=False)
     created_by = Column(String(8))
+
     
  # Establece la relación con la tabla de pacientes
     pacientes = relationship("PacienteModel", back_populates="citas")

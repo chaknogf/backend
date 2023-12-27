@@ -40,9 +40,8 @@ Tconsultas = ('''
               `medico` INT DEFAULT NULL,
               `archived_by` VARCHAR(8) DEFAULT NULL,
               `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-              `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-              FOREIGN KEY (expediente) REFERENCES pacientes (expediente)
-             )   ENGINE=InnoDB CHARSET=utf8mb4
+              `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+              ) ENGINE=InnoDB CHARSET=utf8mb4
                ''')
 
 tabla_sql = Tconsultas
@@ -86,7 +85,7 @@ class ConsultasModel(Base):
     
     id = Column(Integer, primary_key=True)
     hoja_emergencia = Column(String(12))
-    expediente = Column(Integer, ForeignKey('pacientes.expediente'))
+    expediente = Column(Integer)  # Elimina ForeignKey('pacientes.expediente')
     fecha_consulta = Column(Date)
     hora = Column(Time)
     nombres = Column(String(50))
@@ -115,6 +114,7 @@ class ConsultasModel(Base):
     created_by = Column(String(8))
     created_at = Column(String(25))
     updated_at = Column(String(25))
+
     
    
     

@@ -118,10 +118,6 @@ class PacienteModel(Base):
     # update_at = Column(String(25))
     
    
-# Configura la relación con la tabla de citas
-    citas = relationship("CitasModel", back_populates="pacientes")
-    consultas= relationship("ConsultasModel", back_populates="pacientes")
-    #uisau= relationship("uisauModel", back_populates="pacientes")
 
 class VistaPaciente(Base):
     __tablename__ = "vista_paciente"
