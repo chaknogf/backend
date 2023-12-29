@@ -119,11 +119,6 @@ class ConsultasModel(Base):
    
     
     
-    # Establece la relación con la tabla de pacientes
-    pacientes = relationship("PacienteModel", back_populates="consultas")
-    
-    
-    
 class VistaConsultas(Base):
     __tablename__ = "vista_consultas"
 

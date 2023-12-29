@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker, Session
 MYSQL_HOST = "localhost"
 MYSQL_USER = "root"
 MYSQL_PASSWORD = "Prometeus.0"
-MYSQL_DATABASE = "test_api"
+MYSQL_DATABASE = "debug_rm"
 
 def get_database_connection():
     db = mysql.connector.connect(
@@ -19,7 +19,7 @@ def get_database_connection():
 
 
 # Configuración de la conexión a la base de datos
-SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:Prometeus.0@localhost/test_api"
+SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:Prometeus.0@localhost/debug_rm"
 engine = create_engine(SQLALCHEMY_DATABASE_URL,echo=False)
 Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

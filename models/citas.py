@@ -86,8 +86,7 @@ class CitasModel(Base):
     created_by = Column(String(8))
 
     
- # Establece la relación con la tabla de pacientes
-    pacientes = relationship("PacienteModel", back_populates="citas")
+ 
     
 class VistaCitas(Base):
     __tablename__ = "vista_citas"
