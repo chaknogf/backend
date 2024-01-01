@@ -112,7 +112,7 @@ async def eliminar(id: int):
     finally:
            cursor.close()
  
-@router.get("/filtrarcie10/", tags=["cie10"])
+@router.get("/filtrarcie10/", tags=["Cie10"])
 async def filtro(
     cod: str = Query(None, description="Codigo de cie-10"),
     grupo: str = Query(None, description="Grupo"),

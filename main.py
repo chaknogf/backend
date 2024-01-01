@@ -1,9 +1,10 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 from middlewares.error_hendler import ErrorHandler
 from login_router import router as login_router
 from auth import decode_token, verify_token
-from routers import citas_router, consultas_router, municipio, paciente_router, pandas, uisau_router, usuarios_router, medicos_router, cie10_router
+from routers import citas_router, consultas_router, municipio, paciente_router, pandas, uisau_router, usuarios_router, medicos_router, cie10_router, cons_nac_router
 import jwt
 
 
@@ -39,8 +40,15 @@ app.include_router(uisau_router.router, dependencies=[Depends(check_jwt_token)])
 app.include_router(usuarios_router.router, dependencies=[Depends(check_jwt_token)])
 app.include_router(medicos_router.router, dependencies=[Depends(check_jwt_token)])
 app.include_router(cie10_router.router, dependencies=[Depends(check_jwt_token)])
+app.include_router(cons_nac_router.router, dependencies=[Depends(check_jwt_token)])
 
 # # Define una ruta protegida
 # @app.get("/ruta-protegida", tags=["ruta protegida"], dependencies=[Depends(check_jwt_token)])
 # async def ruta_protegida():
 #     return {"mensaje": "¡Has accedido a una ruta protegida!"}
+
+
+# Redirecciona la ruta principal a la documentación ("/docs")
+@app.get("/", include_in_schema=False)
+async def redirect_to_docs():
+    return RedirectResponse(url="/docs")
