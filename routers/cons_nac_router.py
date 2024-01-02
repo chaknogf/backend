@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query, Form
 from pydantic import BaseModel
 from typing import List
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from database.database import engine, Session, Base
 from database import database
 from models.cons_nac import Cons_NacModel
@@ -16,8 +16,38 @@ router = APIRouter()
 db = database.get_database_connection()
 cursor = db.cursor()
 now = datetime.now()
-año = now.year
+año_actual = now.year
 
+def correlativo_unico():
+    try:
+        db = Session()
+        # Obtén la fecha actual
+        fecha_actual = datetime.now()
+        # Obtén el año actual
+        año_actual = datetime.now().year
+        # Calcula la fecha de ayer
+        ayer = (fecha_actual - timedelta(days=1)).year
+    
+        # Verifica si el año ha cambiado y reinicia el contador
+        if año_actual != ayer:
+           cor_nuevo = 1  # Reinicia a 0001
+        else:
+            #continuar el correlativo
+            cor_nuevo = db.execute(select(func.max(Cons_NacModel.cor))).scalar() 
+            cor_nuevo += 1  # Incrementa el correlativo
+
+        # Formatea el correlativo con 4 dígitos
+        correlativo_formateado = str(cor_nuevo).zfill(4)
+
+        return {"cor": correlativo_formateado, "año": año_actual} # Devuelve el valor en un diccionario
+    except SQLAlchemyError as error:
+        return {"error": f"error al consultar: {error}"}
+    finally:
+        # Cerrar la sesión aquí después de obtener el valor
+        db.close()
+        print(f"Ultimo expediente generado no. {cor_nuevo, año_actual}")
+        
+        
 class ConsNac(BaseModel):
     id: int 
     fecha: date
@@ -139,8 +169,12 @@ async def crear_cor(data: ConsNac):
         
         if consulta_verificacion:
             return JSONResponse(status_code=400, content={"message": "ya existe constancia para paciente"})
-        registro = Cons_NacModel()
-    
+        
+        documento = Cons_NacModel(**data.dict())
+        db.add(documento)
+        db.commit()
+        correlativo_unico()
+        return JSONResponse(status_code=201, content={"message": "Registrado con exito"})
     except SQLAlchemyError as error:
         raise HTTPException(status_code=500, detail=f"Error al consultar: {error}")
     finally:
@@ -207,3 +241,11 @@ async def eliminar(id: int):
         return {"message": f"Error al consultar: {error}"}
     finally:
             print(f" ELIMINADO realizado")
+ 
+#correlativo nuevo           
+@router.get("/cor_nuevo", tags=["Constancias de Nacimiento"])
+async def correlativos():   
+    result = correlativo_unico()
+    return result
+
+
