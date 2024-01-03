@@ -81,6 +81,7 @@ class Paciente(BaseModel):
     exp_madre: int | None = None
     created_by: str | None = None
     fechaDefuncion: str | None = None
+    gemelo: str | None = None
     
     
 
@@ -212,6 +213,7 @@ async def actualizar_paciente( Pacient: Paciente, exp: int):
         result.exp_madre = Pacient.exp_madre
         result.created_by = Pacient.created_by
         result.fechaDefuncion = Pacient.fechaDefuncion
+        result.gemelo = Pacient.gemelo
         
         
       

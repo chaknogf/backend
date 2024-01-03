@@ -39,6 +39,7 @@ Tpacientes = ('''
   `telefono_responsable` int DEFAULT NULL,
   `estado` varchar(2) DEFAULT NULL,
   `exp_madre` int DEFAULT NULL,
+  `gemelo` varchar(2) DEFAULT NULL,
   `created_by` varchar(8) DEFAULT NULL,
   `fechaDefuncion` varchar(10) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -114,6 +115,7 @@ class PacienteModel(Base):
     exp_madre = Column(Integer)
     created_by = Column(String(8))
     fechaDefuncion = Column(String(10))
+    gemelo = Column(String(2))
     # created_at = Column(String(25))
     # update_at = Column(String(25))
     
@@ -134,6 +136,7 @@ class VistaPaciente(Base):
     dpi = Column(Integer)
     sexo = Column(String)
     estado = Column(String)
+    gemelo = Column(String)
     
 #CREATE VIEW vista_paciente AS SELECT id, nombre, apellido, expediente, nacimiento  FROM pacientes;    
 #SELECT table_name FROM information_schema.views WHERE table_schema = 'test_api';
