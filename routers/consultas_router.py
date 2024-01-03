@@ -63,7 +63,7 @@ async def obtener_consultas():
             result = (
                 db.query(ConsultasModel)
                 .order_by(desc(ConsultasModel.id))  # Ordena por id en orden descendente
-                .limit(10000)  # Ajusta el límite según tus necesidades
+                .limit(3000)  # Ajusta el límite según tus necesidades
                 .options(lazyload('*'))  # Si es necesario cargar relaciones de manera diferida
                 .all()
             )

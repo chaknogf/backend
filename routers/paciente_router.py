@@ -98,7 +98,7 @@ def retornar_pacientes():
     try:
         db  = Session()
         
-        #result = db.query(VistaPaciente).order_by(desc(VistaPaciente.id)).limit(10000).all()
+        #result = db.query(VistaPaciente).order_by(desc(VistaPaciente.id)).limit(3000).all()
         result = db.query(VistaPaciente).order_by(desc(VistaPaciente.id)).all()
         return JSONResponse(status_code=200, content=jsonable_encoder(result))
     except SQLAlchemyError as error:
