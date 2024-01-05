@@ -63,7 +63,7 @@ async def obtener_consultas():
             result = (
                 db.query(ConsultasModel)
                 .order_by(desc(ConsultasModel.id))  # Ordena por id en orden descendente
-                .limit(3000)  # Ajusta el límite según tus necesidades
+                .limit(1000)  # Ajusta el límite según tus necesidades
                 .options(lazyload('*'))  # Si es necesario cargar relaciones de manera diferida
                 .all()
             )
@@ -343,7 +343,7 @@ async def consult(tipo: int):
             db.query(ConsultasModel)
             .filter(ConsultasModel.tipo_consulta == tipo)
                 .order_by(desc(ConsultasModel.id))  # Ordena por id en orden descendente
-                .limit(10000)  # Ajusta el límite según tus necesidades
+                .limit(1000)  # Ajusta el límite según tus necesidades
                 .options(lazyload('*'))  # Si es necesario cargar relaciones de manera diferida
                 .all()
         )
@@ -372,7 +372,7 @@ async def consult_3():
                 db.query(ConsultasModel)
                 .filter(ConsultasModel.tipo_consulta == 3)
                 .order_by(desc(ConsultasModel.id))  # Ordena por id en orden descendente
-                .limit(10000)  # Ajusta el límite según tus necesidades
+                .limit(1000)  # Ajusta el límite según tus necesidades
                 .options(lazyload('*'))  # Si es necesario cargar relaciones de manera diferida
                 .all()
             )

@@ -12,6 +12,7 @@ from .enums import GeneroEnum, EstadoEnum
 from database.database import Session
 from models.paciente import PacienteModel, VistaPaciente
 import logging
+from sqlalchemy.orm import lazyload
 from typing import List
 
 
@@ -97,9 +98,15 @@ async def obtener_ultimo_expediente():
 def retornar_pacientes():
     try:
         db  = Session()
-        
+        result = (
+                db.query(VistaPaciente)
+                .order_by(desc(VistaPaciente.id))  # Ordena por id en orden descendente
+                .limit(1000)  # Ajusta el límite según tus necesidades
+                .options(lazyload('*'))  # Si es necesario cargar relaciones de manera diferida
+                .all()
+            )
         #result = db.query(VistaPaciente).order_by(desc(VistaPaciente.id)).limit(3000).all()
-        result = db.query(VistaPaciente).order_by(desc(VistaPaciente.id)).all()
+       # result = db.query(VistaPaciente).order_by(desc(VistaPaciente.id)).all()
         return JSONResponse(status_code=200, content=jsonable_encoder(result))
     except SQLAlchemyError as error:
         return {"message": f"error al consultar paciente: {error}"}
