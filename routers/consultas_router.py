@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query, Form
+from fastapi import APIRouter, HTTPException, Query, Form, Depends
 from pydantic import BaseModel
 from typing import List
 from datetime import date, datetime, time
@@ -52,25 +52,28 @@ class Consultas(BaseModel):
     
     
    
-    
+def get_db():
+    with Session() as db:
+        try:
+            yield db
+        finally:
+            db.close()
 
     
-    #Get conectados a SQL
 @router.get("/consultas/", tags=["Consultas"])
-async def obtener_consultas():
+async def obtener_consultas(db: Session = Depends(get_db)):
     try:
-        with Session() as db:
-            result = (
-                db.query(ConsultasModel)
-                .order_by(desc(ConsultasModel.id))  # Ordena por id en orden descendente
-                .limit(1000)  # Ajusta el límite según tus necesidades
-                .options(lazyload('*'))  # Si es necesario cargar relaciones de manera diferida
-                .all()
-            )
-            if not result:
-                return JSONResponse(status_code=200, content=jsonable_encoder([]))
+        result = (
+            db.query(VistaConsultas)
+            .order_by(desc(VistaConsultas.id))
+            .limit(1000)
+            .all()
+        )
 
-            return result
+        if not result:
+            return JSONResponse(status_code=200, content=jsonable_encoder([]))
+
+        return result
 
     except SQLAlchemyError as error:
         raise HTTPException(status_code=500, detail=f"Error al consultar: {error}")

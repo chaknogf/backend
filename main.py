@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from middlewares.error_hendler import ErrorHandler
@@ -6,6 +6,10 @@ from login_router import router as login_router
 from auth import decode_token, verify_token
 from routers import citas_router, consultas_router, municipio, paciente_router, pandas, uisau_router, usuarios_router, medicos_router, cie10_router, cons_nac_router
 import jwt
+import logging
+
+
+
 
 
 # Define un middleware para verificar el token JWT
@@ -52,3 +56,36 @@ app.include_router(cons_nac_router.router, dependencies=[Depends(check_jwt_token
 @app.get("/", include_in_schema=False)
 async def redirect_to_docs():
     return RedirectResponse(url="/docs")
+
+
+# Configura el logger de FastAPI
+log = logging.getLogger("uvicorn.access")
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
+
+# Crea un manejador de registros que formatee la información como deseas
+log_handler = logging.StreamHandler()
+log_formatter = logging.Formatter('%(asctime)s - %(levelname)s - IP: %(client_ip)s - PORT: %(client_port)s')
+log_handler.setFormatter(log_formatter)
+log.addHandler(log_handler)
+
+@app.middleware("http")
+async def custom_logging(request: Request, call_next):
+    try:
+        # Agrega información adicional al registro (en este caso, la IP y el puerto)
+        request.state.client_ip = request.client.host
+        request.state.client_port = request.client.port
+
+        response = await call_next(request)
+
+        # Extrae la información adicional del estado del request
+        client_ip = request.state.client_ip
+        client_port = request.state.client_port
+
+        # Loggea la información
+        log.info("", extra={"client_ip": client_ip, "client_port": client_port})
+
+        return response
+    except HTTPException as e:
+        log.info(f"IP: {request.client.host} - {e}")
+        raise e

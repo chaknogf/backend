@@ -14,34 +14,29 @@ from models.paciente import PacienteModel, VistaPaciente
 import logging
 from sqlalchemy.orm import lazyload
 from typing import List
+from uvicorn.config import LOGGING_CONFIG
 
 
  
 
 router = APIRouter()
-
-
-db = database.get_database_connection()
-cursor = db.cursor()
-logger = logging.getLogger(__name__)
+# Configura el logger de FastAPI
+log = logging.getLogger("uvicorn.access")
+log.setLevel(logging.WARNING)  # Puedes ajustar el nivel según tus necesidades
+# Configura el formato del registro de acceso para mostrar solo la IP
+LOGGING_CONFIG["formatters"]["default"]["fmt"] = '%(h)s - - [%(D)s] "%(r)s" %(s)s'
 
 
 ultimo_expediente = 0
 
 def actualizar_ultimo_exp():
     try:
-        Db = Session()
-        max_exp = Db.execute(select(func.max(PacienteModel.expediente))).scalar()
-        New_exp = max_exp + 1
-        Db.close()
-        return New_exp
+        with Session() as db:
+            max_exp = db.execute(select(func.max(PacienteModel.expediente))).scalar()
+            return max_exp + 1 if max_exp is not None else 1
     except SQLAlchemyError as error:
-        return {"message": f"error al consultar paciente: {error}"}
-    finally:
-        print(f"Ultimo expediente generado no. {max_exp}")
-            
-            
-cont: int 
+        return {"message": f"Error al consultar paciente: {error}"}
+
 
 def get_db():
     db = Session()
@@ -97,21 +92,18 @@ async def obtener_ultimo_expediente():
 @router.get("/pacientes", tags=["Busquedas de Pacientes"])
 def retornar_pacientes():
     try:
-        db  = Session()
         result = (
-                db.query(VistaPaciente)
-                .order_by(desc(VistaPaciente.id))  # Ordena por id en orden descendente
-                .limit(1000)  # Ajusta el límite según tus necesidades
-                .options(lazyload('*'))  # Si es necesario cargar relaciones de manera diferida
-                .all()
-            )
-        #result = db.query(VistaPaciente).order_by(desc(VistaPaciente.id)).limit(3000).all()
-       # result = db.query(VistaPaciente).order_by(desc(VistaPaciente.id)).all()
+            Session().query(VistaPaciente)
+            .order_by(desc(VistaPaciente.id))
+            .limit(1000)
+            #.options(lazyload('*'))
+            .all()
+        )
         return JSONResponse(status_code=200, content=jsonable_encoder(result))
     except SQLAlchemyError as error:
-        return {"message": f"error al consultar paciente: {error}"}
-    finally:
-        print(f"CONSULTADO")
+        return {"message": f"Error al consultar paciente: {error}"}
+    
+        
     
 @router.get("/paciente/{exp}", tags=["Busquedas de Pacientes"])
 async def obtener_paciente(exp: int):
@@ -123,9 +115,7 @@ async def obtener_paciente(exp: int):
         return JSONResponse(status_code=200, content=jsonable_encoder(result))
     except SQLAlchemyError as error:
         return {"message": f"Error al consultar paciente: {error}"}
-    finally:
-        print("CONSULTADO")
-        
+    
         
 @router.get("/pacienteId/", tags=["Busquedas de Pacientes"])
 async def obtener_paciente_id(id: int):
@@ -143,7 +133,6 @@ async def buscar_nacimiento(fecha: str = Query( title="Fecha de nacimiento")):
     except SQLAlchemyError as error:
         return {"message": f"Error al consultar paciente:  {repr(error.erros()[0]['typpe'])}"}
     finally:
-        print(f"id: {id} datetime:{now} CONSULTADO")
         db.close()
 
 @router.get("/pacientefind/", tags=["Busquedas de Pacientes"])
@@ -163,23 +152,22 @@ async def buscar_paciente(cui:int=Query(title="DPI")):
         return {'message': f"Erro al consultar: {repr(error)}"}
     finally:
         db.close()
-        print ("Consultado {cui}")
-    
+        
 
 
-#Post conectado a SQL
+# Post conectado a SQL
 @router.post("/paciente/", tags=["Pacientes"])
-async def crear_paciente(Pacient: Paciente ):
+async def crear_paciente(Pacient: Paciente):
     try:
-        db = Session()
-        nuevo_paciente = PacienteModel(**Pacient.dict())
-        db.add(nuevo_paciente)
-        db.commit()  
-        actualizar_ultimo_exp()
-        cursor.close()
+        with Session() as db:
+            nuevo_paciente = PacienteModel(**Pacient.dict())
+            db.add(nuevo_paciente)
+            db.commit()
+            actualizar_ultimo_exp()
         return JSONResponse(status_code=201, content={"message": "Se ha registrado el paciente"})
     except SQLAlchemyError as error:
-         return {"message": f"error al crear paciente: {error}"}
+        return {"message": f"Error al crear paciente: {error}"}
+
         
  
  
@@ -228,8 +216,7 @@ async def actualizar_paciente( Pacient: Paciente, exp: int):
         return JSONResponse(status_code=201, content={"message": "Actualización Realizada"})
     except SQLAlchemyError as error:
         return {"message": f"Error al consultar paciente: {error}"}
-    finally: 
-            print(f"expediente: {exp} datetime: {now} ACTUALIZADO")
+    
 
 
 
@@ -247,8 +234,7 @@ async def eliminar_paciente(id: int):
         return JSONResponse(status_code=200, content={"message": "Eliminado con éxito"})
     except SQLAlchemyError as error:
         return {"message": f"Error al consultar paciente: {error}"}
-    finally:
-        print("ELIMINADO realizado")
+  
 
 
 
@@ -260,24 +246,11 @@ def buscar_paciente(expe: int):
         adicional = municipio(result.lugar_nacimiento)
         if not result:
             return JSONResponse(status_code=404, content={"message": "No encontrado"})
-        #  # Crear el diccionario adicional con la información extra
-        # adicional = {
-        #     "municipio": municipio(result.lugar_nacimiento),
-        #     "nation": Desc_nacionalidad(result.nacionalidad),
-        #     "people": Desc_people(result.pueblo),
-        #     "ecivil": Desc_Civil(result.estado_civil),
-        #     "academic": Desc_educacion(result.educacion),
-        #     "parents": Desc_parentesco(result.parentesco),
-        #     "lenguage": Desc_idiomas(result.idioma)
-                     
-        #     }
-         # Combinar los datos del paciente con la información adicional
-        # response_data = {**jsonable_encoder(result), **adicional}
+        
         return JSONResponse(status_code=200, content=jsonable_encoder(result))
     except SQLAlchemyError as error:
         return {"message": f"Error al consultar paciente: {error}"}
-    finally:
-        print(f"Expediente: {expe} datetime:{now} CONSULTADO")
+   
    
 def buscar_id(id: int):
     try:
@@ -285,28 +258,11 @@ def buscar_id(id: int):
         result = db.query(PacienteModel).filter(PacienteModel.id == id).first()
         if not result:
             return JSONResponse(status_code=404, content={"message": "No encontrado"})
-       
-        # consulta = result
-       
-        # # Obtener los valores de created_at y updated_at
-        # created_at = consulta.created_at
-        # update_at = consulta.update_at
-
-        # # Convertir las fechas a un formato adecuado si es necesario
-        # created_at_str = created_at.strftime("%Y-%m-%d %H:%M:%S") if created_at else None
-        # update_at_str = update_at.strftime("%Y-%m-%d %H:%M:%S") if update_at else None
-
-        # # Agregar created_at y updated_at al diccionario de resultados
-        # consulta_dict = consulta.__dict__
-       
-        # consulta_dict["created_at"] = created_at_str
-        # consulta_dict["update_at"] = update_at_str
 
         return JSONResponse(status_code=200, content=jsonable_encoder(result))
     except SQLAlchemyError as error:
         return {"message": f"Error al consultar paciente: {error}"}
-    finally:
-        print(f"id: {id} datetime:{now} CONSULTADO")
+   
            
 def buscar_nombre(nombre: str = Query(None, title="Nombre a buscar"), 
                   apellido: str = Query(None, title="Apellido a buscar")):
@@ -323,8 +279,7 @@ def buscar_nombre(nombre: str = Query(None, title="Nombre a buscar"),
     
     except SQLAlchemyError as error:
         return {"message": f"Error al consultar paciente: {error}"}
-    finally:
-        print(f"id: {id} datetime:{now} CONSULTADO")
+    
 
 
 #Funcion para obtener tiempo ahora
