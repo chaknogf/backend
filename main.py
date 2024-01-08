@@ -61,7 +61,7 @@ async def redirect_to_docs():
 # Configura el logger de FastAPI
 log = logging.getLogger("uvicorn.access")
 log = logging.getLogger(__name__)
-log.setLevel(logging.INFO)
+#log.setLevel(logging.INFO)
 
 # Crea un manejador de registros que formatee la información como deseas
 log_handler = logging.StreamHandler()

@@ -56,6 +56,7 @@ class Paciente(BaseModel):
     sexo: GeneroEnum | None = None
     nacimiento: date | None = None
     nacionalidad: int| None = None
+    depto_nac: int | None = None
     lugar_nacimiento: int | None = None
     estado_civil: int | None = None
     educacion: int | None = None
@@ -187,6 +188,7 @@ async def actualizar_paciente( Pacient: Paciente, exp: int):
         result.sexo = Pacient.sexo
         result.nacimiento = Pacient.nacimiento
         result.nacionalidad = Pacient.nacionalidad
+        result.depto_nac = Pacient.depto_nac
         result.lugar_nacimiento = Pacient.lugar_nacimiento
         result.estado_civil = Pacient.estado_civil
         result.educacion = Pacient.educacion

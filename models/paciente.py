@@ -20,6 +20,7 @@ Tpacientes = ('''
   `sexo` varchar(2) DEFAULT NULL,
   `nacimiento` date DEFAULT NULL,
   `nacionalidad` int DEFAULT NULL,
+  `depto_nac` int DEFAULT NULL,
   `lugar_nacimiento` int DEFAULT NULL,
   `estado_civil` int DEFAULT NULL,
   `educacion` int DEFAULT NULL,
@@ -94,6 +95,7 @@ class PacienteModel(Base):
     sexo = Column(String(2))
     nacimiento = Column(Date)
     nacionalidad = Column(Integer)
+    depto_nac = Column(Integer)
     lugar_nacimiento = Column(Integer)
     estado_civil = Column(Integer)
     educacion = Column(Integer)
