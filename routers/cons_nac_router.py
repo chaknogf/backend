@@ -52,7 +52,7 @@ class ConsNac(BaseModel):
     id: int 
     fecha: date
     cor: int | None = None
-    año: int | None = None 
+    ao: int | None = None 
     doc: str | None = None 
     fecha_parto: date | None = None
     madre: str | None = None

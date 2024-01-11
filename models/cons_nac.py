@@ -13,7 +13,7 @@ Tcons_nac = ('''
     `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `fecha` DATE DEFAULT NULL,
     `cor` INT DEFAULT NULL,
-    `año` INT DEFAULT NULL,
+    `ao` INT DEFAULT NULL,
     `doc` VARCHAR(9) DEFAULT NULL UNIQUE,
     `fecha_parto` DATE DEFAULT NULL,  
     `madre` VARCHAR(100) DEFAULT NULL,
@@ -64,7 +64,7 @@ class Cons_NacModel(Base):
     id = Column(Integer, primary_key=True)
     fecha = Column(Date)
     cor = Column(Integer)
-    año = Column(Integer)
+    ao = Column(Integer)
     doc = Column(String(9))
     fecha_parto = Column(Date)
     madre = Column(String(100))
