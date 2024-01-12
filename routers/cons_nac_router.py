@@ -18,33 +18,38 @@ cursor = db.cursor()
 now = datetime.now()
 año_actual = now.year
 
+
 def correlativo_unico():
     try:
-        db = Session()
-        # Obtén la fecha actual
-        fecha_actual = datetime.now()
-        # Obtén el año actual
-        año_actual = datetime.now().year
-        # Calcula la fecha de ayer
-        ayer = (fecha_actual - timedelta(days=1)).year
-    
-        # Verifica si el año ha cambiado y reinicia el contador
-        if año_actual != ayer:
-           cor_nuevo = 1  # Reinicia a 0001
-        else:
-            #continuar el correlativo
-            cor_nuevo = db.execute(select(func.max(Cons_NacModel.cor))).scalar() 
-            cor_nuevo += 1  # Incrementa el correlativo
+        with Session() as db:
+            # Obtén la fecha actual
+            fecha_actual = datetime.now()
+            # Obtén el año actual
+            año_actual = fecha_actual.year
+            # Calcula la fecha de ayer
+            ayer = (fecha_actual - timedelta(days=1)).year
 
-        # Formatea el correlativo con 4 dígitos
-        correlativo_formateado = str(cor_nuevo).zfill(4)
+            cor_nuevo = None
 
-        return {"cor": correlativo_formateado, "año": año_actual} # Devuelve el valor en un diccionario
+            # Verifica si el año ha cambiado y reinicia el contador
+            if año_actual != ayer:
+                cor_nuevo = 1  # Reinicia a 0001
+            elif cor_nuevo is None:
+                cor_nuevo = 1
+            else:
+                # Continuar el correlativo
+                cor_nuevo = db.execute(select(func.max(Cons_NacModel.cor))).scalar() or 0
+                cor_nuevo += 1  # Incrementa el correlativo
+
+            # Formatea el correlativo con 4 dígitos
+            correlativo_formateado = str(cor_nuevo).zfill(5)
+
+            return {"cor": correlativo_formateado, "año": año_actual}
     except SQLAlchemyError as error:
-        return {"error": f"error al consultar: {error}"}
+        # Maneja la excepción de manera adecuada, podrías imprimir el error o realizar alguna acción específica
+        print(f"Error al consultar: {error}")
+        return {"error": "Error al consultar la base de datos"}
     finally:
-        # Cerrar la sesión aquí después de obtener el valor
-        db.close()
         print(f"Ultimo expediente generado no. {cor_nuevo, año_actual}")
         
         
