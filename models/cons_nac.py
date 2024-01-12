@@ -13,7 +13,7 @@ Tcons_nac = ('''
     `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `fecha` DATE DEFAULT NULL,
     `cor` INT DEFAULT NULL,
-    `año` INT DEFAULT NULL,
+    `ao` INT DEFAULT NULL,
     `doc` VARCHAR(9) DEFAULT NULL UNIQUE,
     `fecha_parto` DATE DEFAULT NULL,  
     `madre` VARCHAR(100) DEFAULT NULL,
