@@ -64,7 +64,7 @@ class Cons_NacModel(Base):
     id = Column(Integer, primary_key=True)
     fecha = Column(Date)
     cor = Column(Integer)
-    año = Column(Integer)
+    ao = Column(Integer)
     doc = Column(String(9))
     fecha_parto = Column(Date)
     madre = Column(String(100))
@@ -89,8 +89,7 @@ class Cons_NacModel(Base):
     tipo_parto = Column(Integer)
     clase_parto = Column(Integer)
     certifica = Column(Integer)
-    created_at = Column(String(25))
-    updated_at = Column(String(25))
+    
     
     
    

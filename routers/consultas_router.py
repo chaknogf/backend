@@ -106,7 +106,7 @@ async def filtro(
             query = query.filter(ConsultasModel.id == id)
             
         if hoja_emergencia:
-            query = query.filter(ConsultasModel.hoja_emergencia == hoja_emergencia)
+            query = query.filter(ConsultasModel.hoja_emergencia.ilike(f"%{hoja_emergencia}%"))
 
         if expediente is not None:
             query = query.filter(ConsultasModel.expediente == expediente)

@@ -52,7 +52,7 @@ class ConsNac(BaseModel):
     id: int 
     fecha: date
     cor: int | None = None
-    año: int | None = None 
+    ao: int | None = None 
     doc: str | None = None 
     fecha_parto: date | None = None
     madre: str | None = None
@@ -191,7 +191,7 @@ async def actualizar(data: ConsNac, id: int):
             return JSONResponse(status_code=404, content={"message": "No encontrado"})
         result.fecha = data.fecha
         result.cor = data.cor
-        result.año = data.año 
+        result.ao = data.ao 
         result.doc = data.doc
         result.fecha_parto = data.fecha_parto
         result.madre = data.madre
@@ -248,4 +248,49 @@ async def correlativos():
     result = correlativo_unico()
     return result
 
+
+@router.get("/filtrarConstanciaN/", tags=["Constancias de Nacimiento"])
+async def filtro(
+    fecha: str = Query(None, description="Fecha de constancia"),
+    cor: str = Query(None, description="correlativo"),
+    fecha_parto: str = Query(None, description="Fecha de parto"),
+    madre: str = Query(None, description="Nombre de la madre"),
+    medico: int = Query(None, description="Medico"),
+    certifica: int = Query(None, description="Certifica"),
+    tipo_parto: int = Query(None, description="Tipo de parto"),
+    clase_parto: int = Query(None, description="Clase de parto"),
+    lb: int = Query(None, description="Libras"),
+    onz: int = Query(None, description="onzas")
+    
+):
+    try:
+        db = Session()
+        query = db.query(Cons_NacModel)
+        
+        if fecha is not None:
+            query = query.filter(Cons_NacModel.fecha == fecha)
+        if  cor:
+            query = query.filter(Cons_NacModel.cor.ilike(f"%{cor}%"))
+        if fecha_parto is not None:
+            query = query.filter(Cons_NacModel.fecha_parto == fecha_parto)
+        if madre:
+            query = query.filter(Cons_NacModel.madre.ilike(f"%{madre}%"))
+        if medico is not None:
+            query = query.filter(Cons_NacModel.medico == medico)
+        if certifica is not None:
+            query = query.filter(Cons_NacModel.certifica == certifica)
+        if tipo_parto is not None:
+            query = query.filter(Cons_NacModel.tipo_parto == tipo_parto)
+        if clase_parto is not None:
+            query = query.filter(Cons_NacModel.clase_parto == clase_parto)
+        if lb is not None:
+            query = query.filter(Cons_NacModel.lb == lb)
+        if onz is not None:
+            query = query.filter(Cons_NacModel.onz == onz)
+            
+        result = query.all()
+        return result
+    except Exception as e:
+        return {"error": str(e)}
+        
 
