@@ -77,6 +77,7 @@ class ConsNac(BaseModel):
     tipo_parto: int | None = None
     clase_parto: int | None = None
     certifica: int | None = None
+    create_by: str | None = None
     
     
     #gets
