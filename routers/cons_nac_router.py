@@ -50,7 +50,7 @@ def correlativo_unico():
         print(f"Error al consultar: {error}")
         return {"error": "Error al consultar la base de datos"}
     finally:
-        print(f"Ultimo expediente generado no. {cor_nuevo, año_actual}")
+        cursor.close()
         
         
 class ConsNac(BaseModel):
@@ -66,6 +66,7 @@ class ConsNac(BaseModel):
     libro: int | None = None
     folio: int | None = None
     partida: int | None = None
+    depto: int | None = None
     muni: int | None = None
     edad: int | None = None
     vecindad: int | None = None
@@ -206,6 +207,7 @@ async def actualizar(data: ConsNac, id: int):
         result.libro = data.libro
         result.folio = data.folio
         result.partida = data.partida
+        result.depto = data.depto
         result.muni = data.muni
         result.edad = data.edad
         result.vecindad = data.vecindad

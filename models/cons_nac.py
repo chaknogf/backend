@@ -22,6 +22,7 @@ Tcons_nac = ('''
     `libro` INT DEFAULT NULL,
     `folio` INT DEFAULT NULL,
     `partida` INT DEFAULT NULL,
+    `depto` INT DEFAULT NULL,    
     `muni` INT DEFAULT NULL,
     `edad` INT DEFAULT NULL,
     `vecindad` INT DEFAULT NULL,
@@ -74,6 +75,7 @@ class Cons_NacModel(Base):
     libro = Column(Integer)
     folio = Column(Integer)
     partida = Column(Integer)
+    depto = Column(Integer)
     muni = Column(Integer)
     edad = Column(Integer)
     vecindad = Column(Integer)
