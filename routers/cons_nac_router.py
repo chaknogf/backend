@@ -84,6 +84,7 @@ class ConsNac(BaseModel):
     clase_parto: int | None = None
     certifica: int | None = None
     create_by: str | None = None
+    expediente: int | None = None
     
     
     #gets
@@ -196,6 +197,7 @@ async def actualizar(data: ConsNac, id: int):
         result = db.query(Cons_NacModel).filter(Cons_NacModel.id == id).first()
         if not result:
             return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        result.expediente = data.expediente
         result.fecha = data.fecha
         result.cor = data.cor
         result.ao = data.ao 
