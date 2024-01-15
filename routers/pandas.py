@@ -10,6 +10,7 @@ from models.uisau import uisauModel
 from models.paciente import PacienteModel
 from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError
+#from municipio import municipios
 
 
 router = APIRouter()
@@ -128,13 +129,74 @@ async def excel_consultas(
             raise HTTPException(status_code=404, detail="No hay datos en el rango de fechas seleccionado")
 
        # Corregir datos según necesidades específicas
+        # Corregir datos según necesidades específicas
         for row in result:
             # Convertir el valor de la columna 'status' a un texto descriptivo
             if row.status == 1:
                 row.status = "Activo"
             elif row.status == 2:
                 row.status = "Archivado"
+
+            # Convertir el valor de la columna 'especialidad' a un texto descriptivo
+            if row.especialidad == 1:
+                row.especialidad = "Medicina Interna"
+            elif row.especialidad == 2:
+                row.especialidad = "Pediatria"
+            elif row.especialidad == 3:
+                row.especialidad = "Ginecologia"
+            elif row.especialidad == 4:
+                row.especialidad = "Cirugia"
+            elif row.especialidad == 5:
+                row.especialidad = "Traumatologia"
+            elif row.especialidad == 6:
+                row.especialidad = "Psicologia"
+            elif row.especialidad == 7:
+                row.especialidad = "Nutricion"
+
+        #convertir el valor de la columna tipo_consulta a un texto descriptivo
+            if row.tipo_consulta == 1:
+                row.tipo_consulta = "COEX"
+            elif row.tipo_consulta == 2:
+                row.tipo_consulta = "Hospitalización"
+            elif row.tipo_consulta == 3:
+                row.tipo_consulta = "Emergencia"
                 
+         #convertir el valor de la columna servicio a un texto descriptivo
+            if row.servicio == 1:
+                row.servicio = "SOP"
+            elif row.servicio == 2:
+                row.servicio = "Maternidad"
+            elif row.servicio == 3:
+                row.servicio = "Ginecologia"
+            elif row.servicio == 4:
+                row.servicio = "Cirugia"
+            elif row.servicio == 5:
+                row.servicio = "Cirugia pedia"
+            elif row.servicio == 6:
+                row.servicio = "Trauma"
+            elif row.servicio == 7:
+                row.servicio = "Trauma pedia"
+            elif row.servicio == 8:
+                row.servicio = "CRN"
+            elif row.servicio == 9:
+                row.servicio = "Pedia"
+            elif row.servicio == 10:
+                row.servicio = "RN"
+            elif row.servicio == 11:
+                row.servicio = "Neonatos"
+            elif row.servicio == 12:
+                row.servicio = "Medicina Hombres"
+            elif row.servicio == 13:
+                row.servicio = "Medicina Mujeres"
+            elif row.servicio == 14:
+                row.servicio = "vsvs"
+            elif row.servicio == 15:
+                row.servicio = "Covid"
+            elif row.servicio == 16:
+                row.servicio = "Labor & parto"
+            elif row.servicio == 17:
+                row.servicio = "area roja emergencia"
+
             # Eliminar la columna '_sa_instance_state'
             del row._sa_instance_state
 
@@ -182,6 +244,74 @@ async def excel_uisau(
        # Corregir datos según necesidades específicas
         for row in result:
             # Convertir el valor de la columna 'status' a un texto descriptivo
+            if row.status == 1:
+                row.status = "Activo"
+            elif row.status == 2:
+                row.status = "Archivado"
+
+            # Convertir el valor de la columna 'especialidad' a un texto descriptivo
+            if row.especialidad == 1:
+                row.especialidad = "Medicina Interna"
+            elif row.especialidad == 2:
+                row.especialidad = "Pediatria"
+            elif row.especialidad == 3:
+                row.especialidad = "Ginecologia"
+            elif row.especialidad == 4:
+                row.especialidad = "Cirugia"
+            elif row.especialidad == 5:
+                row.especialidad = "Traumatologia"
+            elif row.especialidad == 6:
+                row.especialidad = "Psicologia"
+            elif row.especialidad == 7:
+                row.especialidad = "Nutricion"
+
+        #convertir el valor de la columna tipo_consulta a un texto descriptivo
+            if row.tipo_consulta == 1:
+                row.tipo_consulta = "COEX"
+            elif row.tipo_consulta == 2:
+                row.tipo_consulta = "Hospitalización"
+            elif row.tipo_consulta == 3:
+                row.tipo_consulta = "Emergencia"
+                
+         #convertir el valor de la columna servicio a un texto descriptivo
+            if row.servicio == 1:
+                row.servicio = "SOP"
+            elif row.servicio == 2:
+                row.servicio = "Maternidad"
+            elif row.servicio == 3:
+                row.servicio = "Ginecologia"
+            elif row.servicio == 4:
+                row.servicio = "Cirugia"
+            elif row.servicio == 5:
+                row.servicio = "Cirugia pedia"
+            elif row.servicio == 6:
+                row.servicio = "Trauma"
+            elif row.servicio == 7:
+                row.servicio = "Trauma pedia"
+            elif row.servicio == 8:
+                row.servicio = "CRN"
+            elif row.servicio == 9:
+                row.servicio = "Pedia"
+            elif row.servicio == 10:
+                row.servicio = "RN"
+            elif row.servicio == 11:
+                row.servicio = "Neonatos"
+            elif row.servicio == 12:
+                row.servicio = "Medicina Hombres"
+            elif row.servicio == 13:
+                row.servicio = "Medicina Mujeres"
+            elif row.servicio == 14:
+                row.servicio = "vsvs"
+            elif row.servicio == 15:
+                row.servicio = "Covid"
+            elif row.servicio == 16:
+                row.servicio = "Labor & parto"
+            elif row.servicio == 17:
+                row.servicio = "area roja emergencia"
+
+            # Eliminar la columna '_sa_instance_state'
+            del row._sa_instance_state
+
             
                 
             # Eliminar la columna '_sa_instance_state'
@@ -228,6 +358,51 @@ async def excel_pacientes():
        # Corregir datos según necesidades específicas
         for row in result:
             # Convertir el valor de la columna 'status' a un texto descriptivo
+            if row.depto == 1:
+               row.depto = "Guatemala"
+            elif row.depto == 2:
+                row.depto = 'El Progreso' 
+            elif row.depto == 3:
+                row.depto = 'Sacatepéquez' 
+            elif row.depto == 4:
+                row.depto = 'Chimaltenango' 
+            elif row.depto == 5:
+                row.depto = 'Escuintla' 
+            elif row.depto == 6:
+                row.depto = 'Santa Rosa' 
+            elif row.depto == 7:
+                row.depto = 'Sololá' 
+            elif row.depto == 8:
+                row.depto = 'Totonicapán' 
+            elif row.depto == 9:
+                row.depto = 'Quetzaltenango' 
+            elif row.depto == 10:
+                row.depto = 'Suchitepéquez' 
+            elif row.depto == 11:
+                row.depto = 'Retalhuleu' 
+            elif row.depto == 12:
+                row.depto = 'San Marcos' 
+            elif row.depto == 13:
+                row.depto = 'Huehuetenango' 
+            elif row.depto == 14:
+                row.depto = 'Quiché' 
+            elif row.depto == 15:
+                row.depto = 'Baja Verapaz' 
+            elif row.depto == 16:
+                row.depto = 'Alta Verapaz' 
+            elif row.depto == 17:
+                row.depto = 'Petén' 
+            elif row.depto == 18:
+                row.depto = 'Izabal' 
+            elif row.depto == 19:
+                row.depto = 'Zacapa' 
+            elif row.depto == 20:
+                row.depto = 'Chiquimula' 
+            elif row.depto == 21:
+                row.depto = 'Jalapa' 
+            elif row.depto == 22:
+                row.depto = 'Jutiapa' 
+                
            
                 
             # Eliminar la columna '_sa_instance_state'
