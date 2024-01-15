@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Form
+from fastapi import APIRouter, HTTPException, Depends, Form, Query
 from pydantic import BaseModel
 from typing import List
 from datetime import date, datetime, time
@@ -41,7 +41,22 @@ async def obtener_medicos():
 async def obtener_medico(id: int):
     try:
         db = Session()
-        result = db.query.filter(MedicosModel.id == id).first()
+        result = db.query(MedicosModel).filter(MedicosModel.id == id).first()
+        if not result:
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        return JSONResponse(status_code=200, content=jsonable_encoder(result))
+    except SQLAlchemyError as error:
+        return {"message": f"error al consultar: {error}"}
+    finally:
+        cursor.close()
+        
+@router.get("/colegiado/", tags=["medicos"])
+async def obtener_colegiado(col: int):
+    try:
+        db = Session()
+        result = db.query(MedicosModel).filter(MedicosModel.colegiado == col).first()
+        if not result:
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
         return JSONResponse(status_code=200, content=jsonable_encoder(result))
     except SQLAlchemyError as error:
         return {"message": f"error al consultar: {error}"}
@@ -109,3 +124,35 @@ async def eliminar(id: int):
         return {"message": f"Error al consultar: {error}"}
     finally:
            cursor.close()
+
+
+@router.get("/filtrarmedico/", tags=["medicos"])
+async def filtro(
+    name: str = Query(None, description="Nombre de Medico"),
+    colegiado: str = Query(None, description="colegia"),
+    dpi: str = Query(None, description="Diagnostico"),
+    especialidad: int = Query(None, description="especialidad")
+   ):
+    try:
+        
+        db = Session()
+        query = db.query(MedicosModel)
+
+            
+        if name:
+            query = query.filter(MedicosModel.name.ilike(f"%{name}%"))
+
+        if colegiado is not None:
+            query = query.filter(MedicosModel.colegiado == colegiado)
+
+        if dpi:
+            query = query.filter(MedicosModel.dpi.ilike(f"%{dpi}%"))
+
+        if especialidad is not None:
+            query = query.filter(MedicosModel.especialidad == especialidad)
+
+        
+        result = query.all()
+        return result
+    except Exception as e:
+        return {"error": str(e)}  
