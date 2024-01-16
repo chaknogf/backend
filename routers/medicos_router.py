@@ -21,6 +21,7 @@ class Medicos(BaseModel):
     name: str | None = None
     dpi: int | None = None
     especialidad: int | None = None
+    pasaporte: str | None = None
     
     
 # get conectado a SQL
@@ -99,6 +100,7 @@ async def actualizar( medico: Medicos, id: int):
         result.name = medico.name
         result.dpi = medico.dpi
         result.especialidad = medico.especialidad
+        result.pasaporte = medico.pasaporte
         
         db.commit()
         return JSONResponse(status_code=201, content={"message": "Actualización Realizada"})

@@ -10,7 +10,7 @@ from routers.municipio import municipio
 from additionals.adicionales import Desc_Civil,Desc_educacion, Desc_idiomas, Desc_nacionalidad, Desc_parentesco, Desc_people
 from .enums import GeneroEnum, EstadoEnum
 from database.database import Session
-from models.paciente import PacienteModel, VistaPaciente
+from models.paciente import PacienteModel, VistaPaciente, VistaPersona
 import logging
 from sqlalchemy.orm import lazyload
 from typing import List
@@ -104,7 +104,20 @@ def retornar_pacientes():
     except SQLAlchemyError as error:
         return {"message": f"Error al consultar paciente: {error}"}
     
-        
+@router.get("/pacientes", tags=["Busquedas de Pacientes"])
+def retornar_personas():
+    try:
+        result = (
+            Session().query(VistaPersona)
+            .order_by(desc(VistaPersona.id))
+            .limit(1000)
+            #.options(lazyload('*'))
+            .all()
+        )
+        return JSONResponse(status_code=200, content=jsonable_encoder(result))
+    except SQLAlchemyError as error:
+        return {"message": f"Error al consultar paciente: {error}"}
+      
     
 @router.get("/paciente/{exp}", tags=["Busquedas de Pacientes"])
 async def obtener_paciente(exp: int):

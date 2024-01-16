@@ -140,6 +140,23 @@ class VistaPaciente(Base):
     estado = Column(String)
     gemelo = Column(String)
     
+    
+class VistaPersona(Base):
+    __tablename__ = "vista_persona"
+    
+    id = Column(Integer,primary_key=True)
+    nombre = Column(String)
+    apellido = Column(String)
+    expediente = Column(Integer)
+    nacimiento = Column(String)
+    dpi = Column(Integer)
+    sexo = Column(String)
+    municipio = Column(Integer)
+    depto = Column(Integer)
+    direccion = Column(String(100))
+    
+    
 #CREATE VIEW vista_paciente AS SELECT id, nombre, apellido, expediente, nacimiento  FROM pacientes;    
 #SELECT table_name FROM information_schema.views WHERE table_schema = 'test_api';
 
+#CREATE VIEW vista_persona AS SELECT id, nombre, apellido, expediente, nacimiento, dpi, sexo, direccion, municipio, depto  FROM pacientes
