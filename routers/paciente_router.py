@@ -104,7 +104,7 @@ def retornar_pacientes():
     except SQLAlchemyError as error:
         return {"message": f"Error al consultar paciente: {error}"}
     
-@router.get("/pacientes", tags=["Busquedas de Pacientes"])
+@router.get("/personas", tags=["Busquedas de Pacientes"])
 def retornar_personas():
     try:
         result = (

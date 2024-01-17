@@ -53,7 +53,7 @@ Tpacientes = ('''
 
 def vista():
     try:
-        command_vista =('''CREATE VIEW vista_paciente AS SELECT id, nombre, apellido, expediente, nacimiento, dpi, sexo, estado  FROM pacientes''')
+        command_vista =('''CREATE VIEW vista_paciente AS SELECT id, nombre, apellido, expediente, nacimiento, dpi, sexo, estado, gemelo  FROM pacientes''')
         cursor = db.cursor()
         cursor.execute(command_vista)
         db.commit()
@@ -153,10 +153,11 @@ class VistaPersona(Base):
     sexo = Column(String)
     municipio = Column(Integer)
     depto = Column(Integer)
-    direccion = Column(String(100))
+    direccion = Column(String)
+    gemelo = Column(String)
     
     
 #CREATE VIEW vista_paciente AS SELECT id, nombre, apellido, expediente, nacimiento  FROM pacientes;    
 #SELECT table_name FROM information_schema.views WHERE table_schema = 'test_api';
 
-#CREATE VIEW vista_persona AS SELECT id, nombre, apellido, expediente, nacimiento, dpi, sexo, direccion, municipio, depto  FROM pacientes
+#CREATE VIEW vista_persona AS SELECT id, nombre, apellido, expediente, nacimiento, dpi, sexo, direccion, municipio, depto, gemelo  FROM pacientes
