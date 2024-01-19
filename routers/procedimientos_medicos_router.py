@@ -4,7 +4,7 @@ from typing import List
 from datetime import date, datetime, time
 from database.database import engine, Session, Base
 from database import database
-from models.procedimientos import ProceMedicos 
+from models.procedimientos import ProceMedicosModel
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import func, select
@@ -30,9 +30,21 @@ class ProceMedicos(BaseModel):
 async def obtener_procedimientos():
     try:
         db = Session()
-        result = db.query(ProceMedicos).all()
+        result = db.query(ProceMedicosModel).all()
         return JSONResponse(status_code=200, content=jsonable_encoder(result))
     except SQLAlchemyError as error:
         return {"message": f"error al consultar: {error}"}
     finally:
       cursor.close()
+      
+      
+@router.get("/procedimiento/",tags=["Procedimientos Medicos"])
+async def obtener_proce():
+    try:
+        db = Session()
+        result = db.query(ProceMedicosModel).filter(ProceMedicosModel.id == id).first()
+        return JSONResponse(status_code=200, content=jsonable_encoder(result))
+    except SQLAlchemyError as error:
+        return {"message": f"error al consultar: {error}"}
+    finally:
+        cursor.close()

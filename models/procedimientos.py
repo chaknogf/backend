@@ -41,7 +41,7 @@ def crear_tabla():
             print(f"Tabla {tabla_sql} datetime: {datetime.now()} CREADA")
             
 #Definición del modelo de datos            
-class ProceMedicos(Base):
+class ProceMedicosModel(Base):
     __tablename__ = "proce_medicos"
     id = Column(Integer, primary_key=True)
     fecha = Column(String)
