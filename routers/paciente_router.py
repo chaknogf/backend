@@ -74,11 +74,12 @@ class Paciente(BaseModel):
     parentesco: int | None = None
     dpi_responsable: int | None = None
     telefono_responsable: int | None = None
-    estado: EstadoEnum| None = None
+    estado: str| None = None
     exp_madre: int | None = None
     created_by: str | None = None
     fechaDefuncion: str | None = None
     gemelo: str | None = None
+    conyugue: str | None = None
     
     
 
@@ -224,6 +225,7 @@ async def actualizar_paciente( Pacient: Paciente, exp: int):
         result.created_by = Pacient.created_by
         result.fechaDefuncion = Pacient.fechaDefuncion
         result.gemelo = Pacient.gemelo
+        result.conyugue = Pacient.conyugue
         
         
       

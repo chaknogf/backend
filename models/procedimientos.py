@@ -15,7 +15,7 @@ Tproce_medicos = ('''
     `servicio` INT DEFAULT NULL,
     `sexo` VARCHAR(1) DEFAULT NULL,
     `abreviatura` VARCHAR(10) DEFAULT NULL,
-    `procedimiento` INT DEFAULT NULL,
+    `procedimiento` VARCHAR(200) DEFAULT NULL,
     `especialidad` INT DEFAULT NULL,
     `cantidad` INT DEFAULT NULL,
     `medico` INT DEFAULT NULL,
@@ -25,20 +25,32 @@ Tproce_medicos = ('''
 ) ENGINE=InnoDB CHARSET=utf8mb4
              ''')
 
-tabla_sql = Tproce_medicos
+Tcodigo_Proce = ('''
+    CREATE TABLE codigo_Proce (
+    `id` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `abreviatura` VARCHAR(10) DEFAULT NULL,
+    `procedimiento` VARCHAR(200) DEFAULT NULL
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB CHARSET=utf8mb4
+                           ''')
+
+
+tabla_sql_a = Tproce_medicos
+tabla_sql_b = Tcodigo_Proce
 
 def crear_tabla():
     try:
         cursor = db.cursor()
-        cursor.execute(tabla_sql)
+        cursor.execute(tabla_sql_a, tabla_sql_b)
         db.commit()
-        return {"message": f"Tabla {tabla_sql} creada"}
+        return {"message": f"Tabla {tabla_sql_a, tabla_sql_b} creada"}
     except mysql.connector.Error as error:
         return {"message": f"Error al creaer Tabla: {error}"}
     finally:
         if db.is_connected():
             cursor.close()
-            print(f"Tabla {tabla_sql} datetime: {datetime.now()} CREADA")
+            
             
 #Definición del modelo de datos            
 class ProceMedicosModel(Base):
@@ -48,7 +60,17 @@ class ProceMedicosModel(Base):
     servicio = Column(Integer)
     sexo = Column(String)
     abreviatura = Column(String)
+    procedimiento = Column(String)
     especialidad = Column(Integer)
     cantidad = Column(Integer)
     medico = Column(Integer)
     created_by = Column(String)
+    
+    
+#Definición del modelo de datos            
+class CodigosProceModel(Base):
+    __tablename__ = "codigo_Proce"
+    id = Column(Integer, primary_key=True)
+    abreviatura = Column(String)
+    procedimiento = Column(String)
+    

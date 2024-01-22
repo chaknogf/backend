@@ -5,17 +5,22 @@ from middlewares.error_hendler import ErrorHandler
 from login_router import router as login_router
 from auth import decode_token, verify_token
 from routers import citas_router, consultas_router, municipio, paciente_router, pandas, uisau_router, usuarios_router, medicos_router, cie10_router, cons_nac_router
+from routers import procedimientos_medicos_router
 import jwt
 import logging
 
 
 
 
-
-# Define un middleware para verificar el token JWT
-async def check_jwt_token(token: str = Depends(decode_token)):
+async def check_jwt_token(request: Request, token: str = Depends(decode_token)):
     if token is None:
         raise HTTPException(status_code=401, detail="Token inválido o expirado")
+
+    roles = token.get("roles", [])
+
+    request.state.roles = roles  # Almacena los roles en el estado del request
+
+    return token
 
 
 app = FastAPI()
@@ -45,6 +50,7 @@ app.include_router(usuarios_router.router, dependencies=[Depends(check_jwt_token
 app.include_router(medicos_router.router, dependencies=[Depends(check_jwt_token)])
 app.include_router(cie10_router.router, dependencies=[Depends(check_jwt_token)])
 app.include_router(cons_nac_router.router, dependencies=[Depends(check_jwt_token)])
+app.include_router(procedimientos_medicos_router.router, dependencies=[Depends(check_jwt_token)])
 
 # # Define una ruta protegida
 # @app.get("/ruta-protegida", tags=["ruta protegida"], dependencies=[Depends(check_jwt_token)])
@@ -61,7 +67,7 @@ async def redirect_to_docs():
 # Configura el logger de FastAPI
 log = logging.getLogger("uvicorn.access")
 log = logging.getLogger(__name__)
-#log.setLevel(logging.INFO)
+# log.setLevel(logging.INFO)
 
 # Crea un manejador de registros que formatee la información como deseas
 log_handler = logging.StreamHandler()

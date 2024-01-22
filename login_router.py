@@ -33,6 +33,8 @@ async def login(form_data: LoginRequest, db: Session = Depends(get_db_session)):
     if usuario.password != form_data.password:
         raise HTTPException(status_code=401, detail="Credenciales inválidas")
 
-    # Las credenciales son válidas, generamos el token JWT
-    access_token = create_access_token(data={"sub": usuario.username})
+    # Las credenciales son válidas, generamos el token JWT con información detallada sobre los roles
+    roles = {"root": usuario.rol == 1, "registros": usuario.rol == 2, "uisau": usuario.rol == 3, "read_only": usuario.rol == 4}
+    access_token = create_access_token(data={"sub": usuario.username, "roles": roles})
+    
     return {"access_token": access_token, "token_type": "bearer", "user_code": usuario.code, "username": usuario.username}

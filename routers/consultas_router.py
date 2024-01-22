@@ -138,7 +138,7 @@ async def filtro(
         if status:
             query = query.filter(ConsultasModel.status == status)
 
-        result = query.all()
+        result = query.limit(1000).all()
         return result
     except Exception as e:
         return {"error": str(e)}    

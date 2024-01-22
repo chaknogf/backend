@@ -8,6 +8,8 @@ from database import database
 from models.consulta import ConsultasModel
 from models.uisau import uisauModel
 from models.paciente import PacienteModel
+from models.procedimientos import ProceMedicosModel, CodigosProceModel
+from models.medicos import MedicosModel
 from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError
 #from municipio import municipios
@@ -432,3 +434,77 @@ async def excel_pacientes():
 
     except SQLAlchemyError as error:
         raise HTTPException(status_code=500, detail=f"Error al consultar la base de datos: {error}")
+    
+    
+@router.get("/report_procedimiento/", tags=["Estadísticas"])
+async def excel_consultas(
+    fecha_inicio: str = Query(None, title="Fecha inicial"),
+    fecha_final: str = Query(None, title="Fecha final"),
+):
+    try:
+        db = Session()
+
+        # Obtener datos de la base de datos en el rango de fechas
+        result = db.query(ProceMedicosModel).filter(ProceMedicosModel.fecha.between(fecha_inicio, fecha_final)).all()
+
+        # Verificar si hay datos en el rango de fechas
+        if not result:
+            raise HTTPException(status_code=404, detail="No hay datos en el rango de fechas seleccionado")
+
+        # Corregir datos según necesidades específicas
+        for row in result:
+
+            # Convertir el valor de la columna 'especialidad' a un texto descriptivo
+            if row.especialidad == 1:
+                row.especialidad = "Medicina Interna"
+            elif row.especialidad == 2:
+                row.especialidad = "Pediatria"
+            elif row.especialidad == 3:
+                row.especialidad = "Ginecologia"
+            elif row.especialidad == 4:
+                row.especialidad = "Cirugia"
+            elif row.especialidad == 5:
+                row.especialidad = "Traumatologia"
+            elif row.especialidad == 6:
+                row.especialidad = "Psicologia"
+            elif row.especialidad == 7:
+                row.especialidad = "Nutricion"
+
+        #convertir el valor de la columna tipo_consulta a un texto descriptivo
+             # Convertir el valor de la columna 'procedimiento' a un texto descriptivo
+            codigo_result = db.query(ProceMedicosModel.procedimiento).filter(ProceMedicosModel.abreviatura == row.abreviatura).first()
+            row.procedimiento = codigo_result.procedimiento if codigo_result else "Desconocido"
+                
+         #convertir el valor de la columna servicio a un texto descriptivo
+            codigo_result = db.query(ProceMedicosModel.medico).filter(MedicosModel.colegiado == row.medico).first()
+            row.medico = codigo_result.name if codigo_result else "Desconocido"
+
+            # Eliminar la columna '_sa_instance_state'
+            del row._sa_instance_state
+
+
+        # Crear un DataFrame de Pandas con los resultados
+        df = pd.DataFrame([row.__dict__ for row in result])
+
+        # Crear un objeto BytesIO para almacenar el archivo Excel
+        excel_io = BytesIO()
+
+        # Utilizar Pandas para escribir el DataFrame en un archivo Excel en BytesIO
+        df.to_excel(excel_io, index=False, engine="openpyxl")
+
+        # Configurar la posición del puntero al principio del BytesIO
+        excel_io.seek(0)
+
+        # Configurar los encabezados de la respuesta para indicar un archivo Excel
+        headers = {
+            "Content-Disposition": "attachment; filename=informe.xlsx",
+            "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        }
+
+        # Devolver una StreamingResponse con el archivo Excel
+        return StreamingResponse(io.BytesIO(excel_io.read()), headers=headers)
+
+    except SQLAlchemyError as error:
+        raise HTTPException(status_code=500, detail=f"Error al consultar la base de datos: {error}")
+    
+

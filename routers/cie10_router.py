@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException, Depends, Form, Query
+from fastapi import APIRouter, HTTPException, Depends, Form, Query, Request
 from pydantic import BaseModel
 from typing import List
 from datetime import date, datetime, time
+from auth import decode_token
 from database.database import engine, Session, Base
 from database import database
 from models.cie10 import Cie10Model
@@ -9,6 +10,7 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import func, select
 from sqlalchemy.exc import SQLAlchemyError
+
 
 router = APIRouter()
 db = database.get_database_connection()
@@ -24,11 +26,19 @@ class Cie10(BaseModel):
     especialidad: int | None | None
     
     
+# Función de dependencia para obtener roles desde el token
+async def get_roles(token: dict = Depends(decode_token)):
+    return token.get("roles", {})
+    
 # get conectado a SQL
 
 @router.get("/cie10/", tags=["Cie10"])
-async def obtener_dxs():
+async def obtener_dxs(roles: dict = Depends(get_roles)):
     try:
+        # # Verifica que el usuario tenga permisos para el método GET
+        # if roles.get("read_only", False):
+        #     raise HTTPException(status_code=403, detail="Acceso no autorizado (solo lectura)")
+    
         db = Session()
         result = db.query(Cie10Model).all()
         return JSONResponse(status_code=200, content=jsonable_encoder(result))
