@@ -94,15 +94,15 @@ async def obtener_abre(abreviatura: str):
 async def crear(proce: ProceMedicos):
     try:
         db = Session()
-        verificar = db.query(ProceMedicosModel).filter(
-            ProceMedicosModel.fecha == proce.fecha,
-            ProceMedicosModel.especialidad == proce.especialidad,
-            ProceMedicosModel.procedimiento == proce.procedimiento,
-            ProceMedicosModel.servicio == proce.servicio
-        ).first()
+        # verificar = db.query(ProceMedicosModel).filter(
+        #     ProceMedicosModel.fecha == proce.fecha,
+        #     ProceMedicosModel.especialidad == proce.especialidad,
+        #     ProceMedicosModel.procedimiento == proce.procedimiento,
+        #     ProceMedicosModel.servicio == proce.servicio
+        # ).first()
         
-        if verificar:
-            return JSONResponse(status_code=400, content={"message": "ya existe"})
+        # if verificar:
+        #     return JSONResponse(status_code=400, content={"message": "ya existe"})
         
         registro = ProceMedicosModel(**proce.dict())
         db.add(registro)
