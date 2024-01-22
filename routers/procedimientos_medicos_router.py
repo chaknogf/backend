@@ -119,8 +119,7 @@ async def crear_abreviatura(codigo: CodigosProces):
     try:
         db = Session()
         verificar = db.query(CodigosProceModel).filter(
-            CodigosProceModel.abreviatura == codigo.abreviatura,
-            CodigosProceModel.procedimiento == codigo.procedimiento,
+            CodigosProceModel.abreviatura == codigo.abreviatura
         ).first()
         
         if verificar:
