@@ -98,7 +98,9 @@ async def crear(proce: ProceMedicos):
             ProceMedicosModel.fecha == proce.fecha,
             ProceMedicosModel.especialidad == proce.especialidad,
             ProceMedicosModel.procedimiento == proce.procedimiento,
-            ProceMedicosModel.servicio == proce.servicio
+            ProceMedicosModel.servicio == proce.servicio,
+            ProceMedicosModel.sexo == proce.sexo
+            
         ).first()
          
         if verificar:
