@@ -94,17 +94,17 @@ async def obtener_abre(abreviatura: str):
 async def crear(proce: ProceMedicos):
     try:
         db = Session()
-        verificar = db.query(ProceMedicosModel).filter(
-            ProceMedicosModel.fecha == proce.fecha,
-            ProceMedicosModel.especialidad == proce.especialidad,
-            ProceMedicosModel.procedimiento == proce.procedimiento,
-            ProceMedicosModel.servicio == proce.servicio,
-            ProceMedicosModel.sexo == proce.sexo
+        # verificar = db.query(ProceMedicosModel).filter(
+        #     ProceMedicosModel.fecha == proce.fecha,
+        #     ProceMedicosModel.especialidad == proce.especialidad,
+        #     ProceMedicosModel.procedimiento == proce.procedimiento,
+        #     ProceMedicosModel.servicio == proce.servicio,
+        #     ProceMedicosModel.sexo == proce.sexo
             
-        ).first()
+        # ).first()
          
-        if verificar:
-            return JSONResponse(status_code=400, content={"message": "ya existe"})
+        # if verificar:
+        #     return JSONResponse(status_code=400, content={"message": "ya existe"})
         
         registro = ProceMedicosModel(**proce.dict())
         db.add(registro)
@@ -258,16 +258,16 @@ async def filtro_abreviatura(
    ):
     try:
         db = Session()
-        query = db.query(ProceMedicosModel)
+        query = db.query(CodigosProceModel)
 
         if id:
-            query = query.filter(ProceMedicosModel.id == id)
+            query = query.filter(CodigosProceModel.id == id)
             
         if abreviatura:
-            query = query.filter(ProceMedicosModel.abreviatura.ilike(f"%{abreviatura}%"))
+            query = query.filter(CodigosProceModel.abreviatura.ilike(f"%{abreviatura}%"))
             
         if procedimiento is not None:
-            query = query.filter(ProceMedicosModel.procedimiento.ilike(f"%{procedimiento}%"))
+            query = query.filter(CodigosProceModel.procedimiento.ilike(f"%{procedimiento}%"))
             
         result = query.all()
         return result
