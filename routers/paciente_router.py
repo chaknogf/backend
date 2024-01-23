@@ -105,6 +105,19 @@ def retornar_pacientes():
     except SQLAlchemyError as error:
         return {"message": f"Error al consultar paciente: {error}"}
     
+@router.get("/pacientes_asc", tags=["Busquedas de Pacientes"])
+def retornar_pacientes_ASC():
+    try:
+        result = (
+            Session().query(VistaPaciente)
+            .limit(1000)
+            #.options(lazyload('*'))
+            .all()
+        )
+        return JSONResponse(status_code=200, content=jsonable_encoder(result))
+    except SQLAlchemyError as error:
+        return {"message": f"Error al consultar paciente: {error}"}   
+
 @router.get("/personas", tags=["Busquedas de Pacientes"])
 def retornar_personas():
     try:
