@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import func,select, desc
 from sqlalchemy.exc import SQLAlchemyError
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from database import database
 from routers.municipio import municipio
 from additionals.adicionales import Desc_Civil,Desc_educacion, Desc_idiomas, Desc_nacionalidad, Desc_parentesco, Desc_people
@@ -315,3 +315,44 @@ def buscar_nombre(nombre: str = Query(None, title="Nombre a buscar"),
 #Funcion para obtener tiempo ahora
 now = datetime.now()
 
+
+@router.get("/filtrarmujer/", tags=["Pacientes"])
+async def filtro(
+    id: int = Query(None, description="Id"),
+    expediente: int = Query(None, description="Número de Expediente"),
+    nombre: str = Query(None, description="Nombres"),
+    apellido: str = Query(None, description="Apellidos"),
+    dpi: str = Query(None, description="DPI"),
+):
+    try:
+        db = Session()
+        query = db.query(VistaPaciente).order_by(desc(VistaPaciente.id)).filter(VistaPaciente.sexo == "F")
+
+        # Calcular la fecha de nacimiento mínima para ser mayor de 10 años
+        fecha_nacimiento_minima = date.today() - timedelta(days=10 * 365)
+
+        # Aplicar la condición de edad
+        query = query.filter(VistaPaciente.nacimiento <= fecha_nacimiento_minima)
+
+        if expediente is not None:
+            query = query.filter(VistaPaciente.expediente == expediente)
+
+        if nombre:
+            query = query.filter(VistaPaciente.nombre.ilike(f"%{nombre}%"))
+
+        if apellido:
+            query = query.filter(VistaPaciente.apellido.ilike(f"%{apellido}%"))
+
+        if dpi:
+            query = query.filter(VistaPaciente.dpi.ilike(f"%{dpi}%"))
+
+        result = query.limit(1000).all()
+        return result
+    except SQLAlchemyError as e:
+        # Manejar errores específicos de SQLAlchemy, si es necesario
+        return {"error": str(e)}
+    except Exception as e:
+        # Manejar otros errores inesperados
+        return {"error": str(e)}
+    
+   

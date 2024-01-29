@@ -262,7 +262,7 @@ async def correlativos():
 @router.get("/filtrarConstanciaN/", tags=["Constancias de Nacimiento"])
 async def filtro(
     fecha: str = Query(None, description="Fecha de constancia"),
-    cor: str = Query(None, description="correlativo"),
+    doc: str = Query(None, description="documento"),
     fecha_parto: str = Query(None, description="Fecha de parto"),
     madre: str = Query(None, description="Nombre de la madre"),
     medico: int = Query(None, description="Medico"),
@@ -270,7 +270,9 @@ async def filtro(
     tipo_parto: int = Query(None, description="Tipo de parto"),
     clase_parto: int = Query(None, description="Clase de parto"),
     lb: int = Query(None, description="Libras"),
-    onz: int = Query(None, description="onzas")
+    onz: int = Query(None, description="onzas"),
+    ao: int = Query(None, description="Año"),
+    expediente: int = Query(None, description="Expediente"),
     
 ):
     try:
@@ -279,8 +281,12 @@ async def filtro(
         
         if fecha is not None:
             query = query.filter(Cons_NacModel.fecha == fecha)
-        if  cor:
-            query = query.filter(Cons_NacModel.cor.ilike(f"%{cor}%"))
+        if ao:
+            query = query.filter(Cons_NacModel.ao == ao)
+        if expediente:
+            query = query.filter(Cons_NacModel.expediente == expediente)
+        if  doc:
+            query = query.filter(Cons_NacModel.doc.ilike(f"%{doc}%"))
         if fecha_parto is not None:
             query = query.filter(Cons_NacModel.fecha_parto == fecha_parto)
         if madre:
