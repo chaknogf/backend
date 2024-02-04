@@ -142,6 +142,7 @@ class VistaConsultas(Base):
     especialidad = Column(String)
     servicio = Column(String)
     tipo_consulta = Column(String)
+    status = Column(Integer)
     
     
      
