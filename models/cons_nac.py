@@ -14,7 +14,7 @@ Tcons_nac = ('''
     `fecha` DATE DEFAULT NULL,
     `cor` INT DEFAULT NULL,
     `ao` INT DEFAULT NULL,
-    `doc` VARCHAR(9) DEFAULT NULL UNIQUE,
+    `doc` VARCHAR(10) DEFAULT NULL UNIQUE,
     `fecha_parto` DATE DEFAULT NULL,  
     `madre` VARCHAR(100) DEFAULT NULL,
     `dpi` BIGINT DEFAULT NULL,
@@ -68,7 +68,7 @@ class Cons_NacModel(Base):
     fecha = Column(Date)
     cor = Column(Integer)
     ao = Column(Integer)
-    doc = Column(String(9))
+    doc = Column(String(10))
     fecha_parto = Column(Date)
     madre = Column(String(100))
     dpi = Column(BigInteger)
