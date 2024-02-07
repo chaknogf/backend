@@ -23,7 +23,7 @@ class Citas(BaseModel):
     fecha: date | None = None
     expediente: int | None = None
     especialidad: int  | None = None
-    cirugia_programada: date | None = None
+    fecha_cita: date | None = None
     nota: str | None = None
     estado: bool | None = None
     created_by: str | None = None
@@ -138,7 +138,7 @@ async def actualizar_cita(cita: Citas, id: int):
             return JSONResponse(status_code=404, content={"message": "No encontrado"})
         result.nota = cita.nota
         result.estado = cita.estado
-        result.cirugia_programada = cita.cirugia_programada
+        result.fecha_cita = cita.fecha_cita
         result.created_by = cita.created_by
         Db.commit()
         return JSONResponse(status_code=201, content={"message": "Actualización realizada"})
@@ -283,7 +283,7 @@ def tablaCitas(data: str, especialidad: int):
             "fecha": None,
             "expediente": None,
             "especialidad": None,
-            "cirugia_programada": None,
+            "fecha_cita": None,
             "nota": None,
             "estado": None,
             "name": "No hay citas"

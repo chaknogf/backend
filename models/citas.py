@@ -17,7 +17,7 @@ Tcitas = ('''
   `fecha` date DEFAULT NULL,
   `expediente` int DEFAULT NULL,
   `especialidad` int DEFAULT NULL,
-  `cirugia_programada` date DEFAULT NULL,
+  `fecha_cita` date DEFAULT NULL,
   `nota` varchar(255) DEFAULT NULL,
   `estado` tinyint(1) DEFAULT '0',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
@@ -83,7 +83,7 @@ class CitasModel(Base):
     fecha = Column(Date)
     expediente = Column(Integer,ForeignKey('pacientes.expediente'))
     especialidad = Column(Integer)
-    cirugia_programada = Column(Date)
+    fecha_cita = Column(Date)
     nota = Column(String(255)) 
     estado = Column(Boolean, default=False)
     created_by = Column(String(8))
