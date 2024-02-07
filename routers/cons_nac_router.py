@@ -18,7 +18,6 @@ cursor = db.cursor()
 now = datetime.now()
 año_actual = now.year
 
-
 def correlativo_unico():
     try:
         with Session() as db:
@@ -33,24 +32,19 @@ def correlativo_unico():
 
             # Verifica si el año ha cambiado y reinicia el contador
             if año_actual != ayer:
-                cor_nuevo = 1  # Reinicia a 0001
+                cor_nuevo = 1  # Reinicia a 00001
             elif cor_nuevo is None:
-                cor_nuevo = 1
-            else:
-                # Continuar el correlativo
+                
                 cor_nuevo = db.execute(select(func.max(Cons_NacModel.cor))).scalar() or 0
-                cor_nuevo += 1  # Incrementa el correlativo
+                cor_nuevo = 1 + cor_nuevo  # Incrementa el correlativo
 
-            # Formatea el correlativo con 4 dígitos
-            correlativo_formateado = str(cor_nuevo).zfill(5)
+            # Formatea el correlativo con 5 dígitos
+            correlativo_formateado = str(cor_nuevo).zfill(4)
 
             return {"cor": correlativo_formateado, "año": año_actual}
     except SQLAlchemyError as error:
-        # Maneja la excepción de manera adecuada, podrías imprimir el error o realizar alguna acción específica
-        print(f"Error al consultar: {error}")
+        # Maneja la excepción de manera adecuada, podrías registrar el error
         return {"error": "Error al consultar la base de datos"}
-    finally:
-        cursor.close()
         
         
 class ConsNac(BaseModel):
