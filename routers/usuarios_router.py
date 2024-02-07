@@ -51,6 +51,18 @@ async def obtener_usuarios(cod: int):
     finally:
         cursor.close()
         
+        
+@router.get("/username/", tags=["usuarios"])
+async def obtener_usuarios(user: str):
+    try:
+        db = Session()
+        result = db.query.filter(UsuariosModel.code == user).first()
+        return JSONResponse(status_code=200, content=jsonable_encoder(result))
+    except SQLAlchemyError as error:
+        return {"message": f"error al consultar: {error}"}
+    finally:
+        cursor.close()
+        
 @router.post("/user/",  tags=["usuarios"])
 async def crear_user(user: Usuarios):
     try:
@@ -92,6 +104,26 @@ async def actualizar( user: Usuarios, id: int):
         result.email = user.email
         result.password = user.password
         result.rol = user.rol
+        
+        db.commit()
+        return JSONResponse(status_code=201, content={"message": "Actualización Realizada"})
+    except SQLAlchemyError as error:
+        return {"message": f"Error al consultar: {error}"}
+    finally: 
+            cursor.close()
+            
+@router.put("/updateuser/{id}", tags=["usuarios"])
+async def actualizar( user: Usuarios, username: str):
+    try:
+        db = Session()
+        result = db.query(UsuariosModel).filter(UsuariosModel.username == username).first()
+        if not result:
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        result.name = user.name
+        result.dpi = user.dpi
+        result.email = user.email
+        result.password = user.password
+        
         
         db.commit()
         return JSONResponse(status_code=201, content={"message": "Actualización Realizada"})
