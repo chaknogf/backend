@@ -19,7 +19,7 @@ Tcitas = ('''
   `especialidad` int DEFAULT NULL,
   `fecha_cita` date DEFAULT NULL,
   `nota` varchar(255) DEFAULT NULL,
-  `estado` tinyint(1) DEFAULT '0',
+  `tipo` tinyint(1) DEFAULT '0',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `created_by` varchar(8) DEFAULT NULL,
@@ -43,7 +43,7 @@ SELECT
 FROM
     citas
 WHERE
-    estado = false  
+    tipo = false  
 GROUP BY
     especialidad, dia
 ''')
@@ -85,7 +85,7 @@ class CitasModel(Base):
     especialidad = Column(Integer)
     fecha_cita = Column(Date)
     nota = Column(String(255)) 
-    estado = Column(Boolean, default=False)
+    tipo = Column(Integer)
     created_by = Column(String(8))
     
  # Establece la relación con la tabla de pacientes

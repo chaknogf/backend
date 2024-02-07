@@ -25,7 +25,7 @@ class Citas(BaseModel):
     especialidad: int  | None = None
     fecha_cita: date | None = None
     nota: str | None = None
-    estado: bool | None = None
+    tipo: int | None = None
     created_by: str | None = None
 
 hoy = date.today()
@@ -137,7 +137,7 @@ async def actualizar_cita(cita: Citas, id: int):
         if not result:
             return JSONResponse(status_code=404, content={"message": "No encontrado"})
         result.nota = cita.nota
-        result.estado = cita.estado
+        result.tipo = cita.tipo
         result.fecha_cita = cita.fecha_cita
         result.created_by = cita.created_by
         Db.commit()
@@ -250,7 +250,7 @@ def buscar_citaId(id: int):
             "especialidad": None,
             "cirugia_programada": None,
             "nota": None,
-            "estado": None
+            "tipo": None
         }
         result = (
             db.query(CitasModel, func.concat(PacienteModel.nombre, " ", PacienteModel.apellido).label("name"))
@@ -285,7 +285,7 @@ def tablaCitas(data: str, especialidad: int):
             "especialidad": None,
             "fecha_cita": None,
             "nota": None,
-            "estado": None,
+            "tipo": None,
             "name": "No hay citas"
         }]
         result = (
