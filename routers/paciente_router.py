@@ -132,7 +132,7 @@ def retornar_personas():
     except SQLAlchemyError as error:
         return {"message": f"Error al consultar paciente: {error}"}
       
-    
+     
 @router.get("/paciente/{exp}", tags=["Busquedas de Pacientes"])
 async def obtener_paciente(exp: int):
     try:

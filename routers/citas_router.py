@@ -127,6 +127,37 @@ async def crear_cita(cita: Citas):
         return JSONResponse(status_code=201, content={"message": "Se ha registrado una nueva cita"})
     except SQLAlchemyError as error:
         return {"message": f"Error al agendar cita: {error}"}
+    
+@router.post("/citaespecial/", response_model=Citas, tags=["Citas"])
+async def cita_especial(cita: Citas):
+    try:
+        db = Session()
+        # Verificar si ya existen 10 citas para la misma especialidad en la misma fecha
+        citas_del_dia = db.query(CitasModel).filter(
+            CitasModel.especialidad == cita.especialidad,
+            CitasModel.fecha == cita.fecha
+        ).count()
+        
+        if citas_del_dia >3:
+            return JSONResponse(status_code=400, content={"message": "Ya se han agendado 3 citas especiales para esta especialidad en esta fecha"})
+        
+        # Verificar si ya existe una cita con la misma especialidad en la misma fecha
+        cita_existente = db.query(CitasModel).filter(
+            CitasModel.expediente == cita.expediente,
+            CitasModel.especialidad == cita.especialidad,
+            CitasModel.fecha == cita.fecha,
+            
+        ).first()
+        
+        if cita_existente:
+            return JSONResponse(status_code=400, content={"message": "Ya existe una cita en la misma especialidad en esta fecha"})
+        
+        nueva_cita = CitasModel(**cita.dict())
+        db.add(nueva_cita)
+        db.commit()
+        return JSONResponse(status_code=201, content={"message": "Se ha registrado una nueva cita"})
+    except SQLAlchemyError as error:
+        return {"message": f"Error al agendar cita: {error}"}
 
    
 @router.put("/citas/{id}", response_model=Citas, tags=["Citas"])

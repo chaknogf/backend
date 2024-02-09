@@ -19,7 +19,7 @@ Tcitas = ('''
   `especialidad` int DEFAULT NULL,
   `fecha_cita` date DEFAULT NULL,
   `nota` varchar(255) DEFAULT NULL,
-  `tipo` tinyint(1) DEFAULT '0',
+  `tipo` int DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `created_by` varchar(8) DEFAULT NULL,
@@ -42,8 +42,7 @@ SELECT
     COUNT(*) AS total_citas
 FROM
     citas
-WHERE
-    tipo = false  
+
 GROUP BY
     especialidad, dia
 ''')
