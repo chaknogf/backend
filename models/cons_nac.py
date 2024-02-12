@@ -41,6 +41,8 @@ Tcons_nac = ('''
     `certifica` INT DEFAULT NULL,
     `create_by` VARCHAR(10) NULL,
     `expediente` INT DEFAULT NULL,
+    `nacionalidad` VARCHAR(25) DEFAULT NULL,
+    `pais` VARCHAR(25) DEFAULT NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB CHARSET=utf8mb4
@@ -95,6 +97,8 @@ class Cons_NacModel(Base):
     certifica = Column(Integer)
     create_by = Column(String(10))
     expediente = Column(Integer)
+    nacionalidad = Column(String(25))
+    pais = Column(String(25))
     
     
      

@@ -79,6 +79,8 @@ class ConsNac(BaseModel):
     certifica: int | None = None
     create_by: str | None = None
     expediente: int | None = None
+    pais: str | None = None
+    nacionalidad: str | None = None
     
      
     #gets
@@ -198,6 +200,8 @@ async def actualizar(data: ConsNac, id: int):
         result.tipo_parto = data.tipo_parto
         result.clase_parto = data.clase_parto
         result.certifica = data.certifica
+        result.nacionalidad = data.nacionalidad
+        result.pais = data.pais
             
     
         db.commit()
