@@ -40,23 +40,33 @@ async def obtener_usuarios():
       cursor.close()
         
 
-@router.get("/usurio/", tags=["usuarios"])
-async def obtener_usuarios(cod: int):
+@router.get("/usuario/", tags=["usuarios"])
+async def obtener_usuario(id: int):
     try:
         db = Session()
-        result = db.query.filter(UsuariosModel.code == cod).first()
+        result = db.query(UsuariosModel).filter(UsuariosModel.id == id).first()
         return JSONResponse(status_code=200, content=jsonable_encoder(result))
     except SQLAlchemyError as error:
         return {"message": f"error al consultar: {error}"}
     finally:
         cursor.close()
         
+@router.get("/usuriocod/", tags=["usuarios"])
+async def obtener_usuario_cod(cod: int):
+    try:
+        db = Session()
+        result = db.query(UsuariosModel).filter(UsuariosModel.code == cod).first()
+        return JSONResponse(status_code=200, content=jsonable_encoder(result))
+    except SQLAlchemyError as error:
+        return {"message": f"error al consultar: {error}"}
+    finally:
+        cursor.close()
         
 @router.get("/username/", tags=["usuarios"])
 async def obtener_usuarios(user: str):
     try:
         db = Session()
-        result = db.query.filter(UsuariosModel.code == user).first()
+        result = db.query(UsuariosModel).filter(UsuariosModel.username == user).first()
         return JSONResponse(status_code=200, content=jsonable_encoder(result))
     except SQLAlchemyError as error:
         return {"message": f"error al consultar: {error}"}

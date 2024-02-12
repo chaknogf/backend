@@ -80,7 +80,7 @@ class ConsNac(BaseModel):
     create_by: str | None = None
     expediente: int | None = None
     
-    
+     
     #gets
     
 @router.get("/consnac/", tags=["Constancias de Nacimiento"])
@@ -109,20 +109,9 @@ async def ver_una_id(id:int):
             return JSONResponse(status_code=404, content={"message": "No encontrado"})
         
         consulta = result
+    
         
-        created_at = consulta.created_at
-        updated_at = consulta.updated_at
-        
-        created_at_str = created_at.strftime("%Y-%m-%d %H:%M:%S") if created_at else None
-        updated_at_str = updated_at.strftime("%Y-%m-%d %H:%M:%S") if updated_at else None
-
-        # Agregar created_at y updated_at al diccionario de resultados
-        consulta_dict = consulta.__dict__
-        
-        consulta_dict["created_at"] = created_at_str
-        consulta_dict["updated_at"] = updated_at_str
-        
-        return JSONResponse(status_code=200, content=jsonable_encoder(consulta_dict))
+        return JSONResponse(status_code=200, content=jsonable_encoder(consulta))
     except SQLAlchemyError as error:
         raise HTTPException(status_code=500, detail=f"Error al consultar: {error}")
     finally:
@@ -138,19 +127,8 @@ async def ver_una_cor(cor:str):
         
         consulta = result
         
-        created_at = consulta.created_at
-        updated_at = consulta.updated_at
-        
-        created_at_str = created_at.strftime("%Y-%m-%d %H:%M:%S") if created_at else None
-        updated_at_str = updated_at.strftime("%Y-%m-%d %H:%M:%S") if updated_at else None
-
-        # Agregar created_at y updated_at al diccionario de resultados
-        consulta_dict = consulta.__dict__
-        
-        consulta_dict["created_at"] = created_at_str
-        consulta_dict["updated_at"] = updated_at_str
-        
-        return JSONResponse(status_code=200, content=jsonable_encoder(consulta_dict))
+      
+        return JSONResponse(status_code=200, content=jsonable_encoder(consulta))
     except SQLAlchemyError as error:
         raise HTTPException(status_code=500, detail=f"Error al consultar: {error}")
     finally:

@@ -97,5 +97,5 @@ class Cons_NacModel(Base):
     expediente = Column(Integer)
     
     
-    
+     
    

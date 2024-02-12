@@ -16,6 +16,7 @@ Tmedicos = ('''
     `dpi` BIGINT DEFAULT NULL,
     `especialidad` INT DEFAULT NULL,
     `pasaporte` pasaporte VARCHAR(30) DEFAULT NULL,
+    `sexo` VARCHAR(1) DEFAULT NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB CHARSET=utf8mb4
@@ -45,4 +46,5 @@ class MedicosModel(Base):
     dpi = Column(BigInteger)
     especialidad = Column(Integer)
     pasaporte = Column(String(30))
+    sexo = Column(String(1))
    
