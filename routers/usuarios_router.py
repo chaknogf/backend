@@ -122,7 +122,7 @@ async def actualizar( user: Usuarios, id: int):
     finally: 
             cursor.close()
             
-@router.put("/updateuser/{id}", tags=["usuarios"])
+@router.put("/updateuser/", tags=["usuarios"])
 async def actualizar( user: Usuarios, username: str):
     try:
         db = Session()
