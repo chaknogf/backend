@@ -30,7 +30,7 @@ Tcons_nac = ('''
     `lb` INT DEFAULT NULL,
     `onz` INT DEFAULT NULL,
     `hora` TIME DEFAULT NULL,
-    `medico` INT DEFAULT NULL, 
+    `medico` VARCHAR(200) DEFAULT NULL, 
     `colegiado` INT DEFAULT NULL,
     `dpi_medico` BIGINT DEFAULT NULL,
     `hijos` INT DEFAULT NULL,
@@ -38,7 +38,7 @@ Tcons_nac = ('''
     `muertos` INT DEFAULT NULL,
     `tipo_parto` INT DEFAULT NULL,
     `clase_parto` INT DEFAULT NULL,
-    `certifica` INT DEFAULT NULL,
+    `certifica` VARCHAR(200) DEFAULT NULL,
     `create_by` VARCHAR(10) NULL,
     `expediente` INT DEFAULT NULL,
     `nacionalidad` VARCHAR(25) DEFAULT NULL,
@@ -86,7 +86,7 @@ class Cons_NacModel(Base):
     lb = Column(Integer)
     onz = Column(Integer)
     hora = Column(Time)
-    medico = Column(Integer)
+    medico = Column(String(200))
     colegiado = Column(Integer)
     dpi_medico = Column(BigInteger)
     hijos = Column(Integer)
@@ -94,7 +94,7 @@ class Cons_NacModel(Base):
     muertos = Column(Integer)
     tipo_parto = Column(Integer)
     clase_parto = Column(Integer)
-    certifica = Column(Integer)
+    certifica = Column(String(200))
     create_by = Column(String(10))
     expediente = Column(Integer)
     nacionalidad = Column(String(25))

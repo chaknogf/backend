@@ -68,7 +68,7 @@ class ConsNac(BaseModel):
     lb: int | None = None
     onz: int | None = None
     hora: time | None = None
-    medico: int | None = None
+    medico: str | None = None
     colegiado: int | None = None
     dpi_medico: int | None = None
     hijos: int | None = None
@@ -76,7 +76,7 @@ class ConsNac(BaseModel):
     muertos: int | None = None
     tipo_parto: int | None = None
     clase_parto: int | None = None
-    certifica: int | None = None
+    certifica: str | None = None
     create_by: str | None = None
     expediente: int | None = None
     pais: str | None = None
