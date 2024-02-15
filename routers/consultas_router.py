@@ -61,8 +61,11 @@ def get_db():
 
     
 @router.get("/consultas/", tags=["Consultas"])
-async def obtener_consultas(db: Session = Depends(get_db)):
+async def obtener_consultas():
     try:
+        db = Session()
+        query = db.query(VistaConsultas)
+        
         result = (
             db.query(VistaConsultas)
             .order_by(desc(VistaConsultas.id))
