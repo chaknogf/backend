@@ -68,6 +68,8 @@ def vista():
         # command_vistaEmergencia =('''CREATE VIEW vista_emergencia AS SELECT id, tipo_consulta, hoja_emergencia, expediente, nombres, apellidos, fecha_consulta, nacimiento, status, fecha_recepcion  FROM consultas''')
         # command_vistaCoex =('''CREATE VIEW vista_coex AS SELECT id, tipo_consulta, expediente, nombres, apellidos, fecha_consulta, nacimiento, especialidad, status, fecha_recepcion  FROM consultas''')
         # command_vistaIngreso =('''CREATE VIEW vista_ingreso AS SELECT id, tipo_consulta, expediente, nombres, apellidos, fecha_consulta, nacimiento, especialidad, fecha_egreso, status, fecha_recepcion  FROM consultas''')
+        # command_vista_censo_camas = ('''CREATE VIEW vista_censo_camas AS SELECT especialidad, fecha_consulta, COUNT(CASE WHEN tipo_consulta = 2 THEN 1 END) AS ingresos, COUNT(CASE WHEN fecha_egreso IS NOT NULL THEN 1 END) AS egresos FROM consultas WHERE fecha_consulta BETWEEN '2024-01-01' AND '2024-01-31' GROUP BY especialidad, fecha_consulta''')
+
         command_vistaConsulta =(''' CREATE VIEW vista_consultas AS SELECT hoja_emergencia,expediente,fecha_consulta,nombres,apellidos,dpi,id,hora,fecha_egreso,especialidad,servicio,tipo_consulta, direccion, status FROM consultas''')
         cursor = db.cursor()
         cursor.execute(command_vistaConsulta)
@@ -145,5 +147,10 @@ class VistaConsultas(Base):
     status = Column(Integer)
     direccion = Column(String)
     
-    
-     
+class VistaCensoCamas(Base):
+    __tablename__ = "vista_censo_camas"
+
+    especialidad = Column(Integer)
+    fecha_consulta = Column(Date, primary_key=True)
+    ingresos = Column(Integer)
+    egresos = Column(Integer)

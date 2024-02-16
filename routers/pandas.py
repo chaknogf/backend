@@ -5,7 +5,7 @@ from io import BytesIO
 import pandas as pd  # Importa Pandas
 from database.database import Session
 from database import database
-from models.consulta import ConsultasModel
+from models.consulta import ConsultasModel, VistaCensoCamas
 from models.uisau import uisauModel
 from models.paciente import PacienteModel
 from models.procedimientos import ProceMedicosModel, CodigosProceModel
@@ -198,6 +198,8 @@ async def excel_consultas(
                 row.servicio = "Labor & parto"
             elif row.servicio == 17:
                 row.servicio = "area roja emergencia"
+            elif row.servicio == 18:
+                row.servicio = "ucin"
 
             # Eliminar la columna '_sa_instance_state'
             del row._sa_instance_state
@@ -310,6 +312,8 @@ async def excel_uisau(
                 row.servicio = "Labor & parto"
             elif row.servicio == 17:
                 row.servicio = "area roja emergencia"
+            elif row.servicio == 18:
+                row.servicio = "ucin"
 
             # Eliminar la columna '_sa_instance_state'
             del row._sa_instance_state
@@ -508,3 +512,37 @@ async def excel_consultas(
         raise HTTPException(status_code=500, detail=f"Error al consultar la base de datos: {error}")
     
 
+def get_vista_censo_camas(fecha_inicio: str, fecha_final: str):
+    try:
+        
+        db = Session()
+        vista_censo_camas = db.query(VistaCensoCamas).filter(VistaCensoCamas.fecha_consulta.between(fecha_inicio, fecha_final)).all()
+        
+        # Convertir el valor de la columna 'especialidad' a un texto descriptivo
+        for row in vista_censo_camas:
+            if row.especialidad == 1:
+                row.especialidad = "Medicina Interna"
+            elif row.especialidad == 2:
+                row.especialidad = "Pediatria"
+            elif row.especialidad == 3:
+                row.especialidad = "Ginecologia"
+            elif row.especialidad == 4:
+                row.especialidad = "Cirugia"
+            elif row.especialidad == 5:
+                row.especialidad = "Traumatologia"
+            elif row.especialidad == 6:
+                row.especialidad = "Psicologia"
+            elif row.especialidad == 7:
+                row.especialidad = "Nutricion"
+
+        return vista_censo_camas
+    finally:
+        db.close()
+
+@router.get("/censo_camas/", tags=["Estadísticas"])
+async def censo_camas(fecha_inicio: str, fecha_final: str):
+    db = Session()
+    vista_censo_camas = get_vista_censo_camas(fecha_inicio, fecha_final, db)
+    if not vista_censo_camas:
+        raise HTTPException(status_code=404, detail="No se encontraron datos")
+    return vista_censo_camas
