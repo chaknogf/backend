@@ -5,7 +5,7 @@ from io import BytesIO
 import pandas as pd  # Importa Pandas
 from database.database import Session
 from database import database
-from models.consulta import ConsultasModel, VistaCensoCamas
+from models.consulta import ConsultasModel#, VistaCensoCamas
 from models.uisau import uisauModel
 from models.paciente import PacienteModel
 from models.procedimientos import ProceMedicosModel, CodigosProceModel
@@ -512,35 +512,35 @@ async def excel_consultas(
         raise HTTPException(status_code=500, detail=f"Error al consultar la base de datos: {error}")
     
 
-def get_vista_censo_camas(fecha_inicio: str, fecha_final: str):
-    try:
+# def get_vista_censo_camas(fecha_inicio: str, fecha_final: str):
+#     try:
         
-        db = Session()
-        vista_censo_camas = db.query(VistaCensoCamas).filter(VistaCensoCamas.fecha_consulta.between(fecha_inicio, fecha_final)).all()
+#         db = Session()
+#         vista_censo_camas = db.query(VistaCensoCamas).filter(VistaCensoCamas.fecha_consulta.between(fecha_inicio, fecha_final)).all()
         
-        # Convertir el valor de la columna 'especialidad' a un texto descriptivo
-        for row in vista_censo_camas:
-            if row.especialidad == 1:
-                row.especialidad = "Medicina Interna"
-            elif row.especialidad == 2:
-                row.especialidad = "Pediatria"
-            elif row.especialidad == 3:
-                row.especialidad = "Ginecologia"
-            elif row.especialidad == 4:
-                row.especialidad = "Cirugia"
-            elif row.especialidad == 5:
-                row.especialidad = "Traumatologia"
-            elif row.especialidad == 6:
-                row.especialidad = "Psicologia"
-            elif row.especialidad == 7:
-                row.especialidad = "Nutricion"
+#         # Convertir el valor de la columna 'especialidad' a un texto descriptivo
+#         for row in vista_censo_camas:
+#             if row.especialidad == 1:
+#                 row.especialidad = "Medicina Interna"
+#             elif row.especialidad == 2:
+#                 row.especialidad = "Pediatria"
+#             elif row.especialidad == 3:
+#                 row.especialidad = "Ginecologia"
+#             elif row.especialidad == 4:
+#                 row.especialidad = "Cirugia"
+#             elif row.especialidad == 5:
+#                 row.especialidad = "Traumatologia"
+#             elif row.especialidad == 6:
+#                 row.especialidad = "Psicologia"
+#             elif row.especialidad == 7:
+#                 row.especialidad = "Nutricion"
 
-        return vista_censo_camas
-    finally:
-        db.close()
+#         return vista_censo_camas
+#     finally:
+#         db.close()
 
-@router.get("/censo_camas/", tags=["Estadísticas"])
-async def censo_camas(fecha_inicio: str, fecha_final: str):
+# @router.get("/censo_camas/", tags=["Estadísticas"])
+# async def censo_camas(fecha_inicio: str, fecha_final: str):
     db = Session()
     vista_censo_camas = get_vista_censo_camas(fecha_inicio, fecha_final, db)
     if not vista_censo_camas:

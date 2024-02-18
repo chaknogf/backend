@@ -392,3 +392,39 @@ async def filtro(
         # Manejar otros errores inesperados
         return {"error": str(e)}
     
+@router.get("/filtrarpaciente/", tags=["Pacientes"])
+async def filtro_p(
+    id: int = Query(None, description="Id"),
+    expediente: int = Query(None, description="Número de Expediente"),
+    nombre: str = Query(None, description="Nombres"),
+    apellido: str = Query(None, description="Apellidos"),
+    dpi: str = Query(None, description="DPI"),
+):
+    try:
+        db = Session()
+        query = db.query(VistaPaciente).order_by(desc(VistaPaciente.id))
+
+        if id is not None:
+            query = query.filter(VistaPaciente.id == id)
+            
+        if expediente is not None:
+            query = query.filter(VistaPaciente.expediente == expediente)
+
+        if nombre:
+            query = query.filter(VistaPaciente.nombre.ilike(f"%{nombre}%"))
+
+        if apellido:
+            query = query.filter(VistaPaciente.apellido.ilike(f"%{apellido}%"))
+
+        if dpi:
+            query = query.filter(VistaPaciente.dpi.ilike(f"%{dpi}%"))
+
+        result = query.limit(1000).all()
+        return result
+    except SQLAlchemyError as e:
+        # Manejar errores específicos de SQLAlchemy, si es necesario
+        return {"error": str(e)}
+    except Exception as e:
+        # Manejar otros errores inesperados
+        return {"error": str(e)}
+    
