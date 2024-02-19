@@ -392,7 +392,7 @@ async def filtro(
         # Manejar otros errores inesperados
         return {"error": str(e)}
     
-@router.get("/filtrarpaciente/", tags=["Pacientes"])
+@router.get("/filtrarpaciente_/", tags=["Pacientes"])
 async def filtro_p(
     id: int = Query(None, description="Id"),
     expediente: int = Query(None, description="Número de Expediente"),
