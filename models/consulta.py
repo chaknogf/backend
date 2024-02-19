@@ -68,7 +68,10 @@ def vista():
         # command_vistaEmergencia =('''CREATE VIEW vista_emergencia AS SELECT id, tipo_consulta, hoja_emergencia, expediente, nombres, apellidos, fecha_consulta, nacimiento, status, fecha_recepcion  FROM consultas''')
         # command_vistaCoex =('''CREATE VIEW vista_coex AS SELECT id, tipo_consulta, expediente, nombres, apellidos, fecha_consulta, nacimiento, especialidad, status, fecha_recepcion  FROM consultas''')
         # command_vistaIngreso =('''CREATE VIEW vista_ingreso AS SELECT id, tipo_consulta, expediente, nombres, apellidos, fecha_consulta, nacimiento, especialidad, fecha_egreso, status, fecha_recepcion  FROM consultas''')
-        # command_vista_censo_camas = ('''CREATE VIEW vista_censo_camas AS SELECT especialidad, fecha_consulta, COUNT(CASE WHEN tipo_consulta = 2 THEN 1 END) AS ingresos, COUNT(CASE WHEN fecha_egreso IS NOT NULL THEN 1 END) AS egresos FROM consultas WHERE fecha_consulta BETWEEN '2024-01-01' AND '2024-01-31' GROUP BY especialidad, fecha_consulta''')
+        # command_vista_censo_camas = ('''
+        # CREATE VIEW vista_censo_camas AS SELECT especialidad, servicio, sexo, fecha_consulta AS fecha, COUNT(*) AS ingresos, 0 AS egresos FROM consultas WHERE tipo_consulta = 2
+        # GROUP BY especialidad, servicio, sexo, fecha_consulta UNION ALL SELECT especialidad, servicio, sexo, fecha_egreso AS fecha, 0 AS ingresos, COUNT(*) AS egresos FROM
+        # consultas WHERE tipo_consulta = 2 GROUP BY especialidad, servicio, sexo, fecha_egreso; ''')
 
         command_vistaConsulta =(''' CREATE VIEW vista_consultas AS SELECT hoja_emergencia,expediente,fecha_consulta,nombres,apellidos,dpi,id,hora,fecha_egreso,especialidad,servicio,tipo_consulta, direccion, status, sexo FROM consultas''')
         cursor = db.cursor()
