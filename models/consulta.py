@@ -73,7 +73,7 @@ def vista():
         # GROUP BY especialidad, servicio, sexo, fecha_consulta UNION ALL SELECT especialidad, servicio, sexo, fecha_egreso AS fecha, 0 AS ingresos, COUNT(*) AS egresos FROM
         # consultas WHERE tipo_consulta = 2 GROUP BY especialidad, servicio, sexo, fecha_egreso; ''')
 
-        command_vistaConsulta =(''' CREATE VIEW vista_consultas AS SELECT hoja_emergencia,expediente,fecha_consulta,nombres,apellidos,dpi,id,hora,fecha_egreso,especialidad,servicio,tipo_consulta, direccion, status, sexo FROM consultas''')
+        command_vistaConsulta =(''' CREATE VIEW vista_consultas AS SELECT hoja_emergencia,expediente,fecha_consulta,nombres,apellidos,dpi,id,hora,fecha_egreso,especialidad,servicio,tipo_consulta, direccion, status, sexo, nacimiento FROM consultas''')
         cursor = db.cursor()
         cursor.execute(command_vistaConsulta)
         db.commit()
@@ -150,6 +150,7 @@ class VistaConsultas(Base):
     status = Column(Integer)
     direccion = Column(String)
     sexo = Column(String)
+    nacimiento = Column(String)
     
 # class VistaCensoCamas(Base):
 #     __tablename__ = "vista_censo_camas"
