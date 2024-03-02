@@ -1,0 +1,8 @@
+docker network create sysNet
+
+docker run -d --name elSQL --network sysNet -e MYSQL_ROOT_PASSWORD=Prometeus.0 -e MYSQL_DATABASE=test_api -p 3306:3306 mysql:latest
+
+docker run -d --name bknd --network sysNet -p 3000:8000 ubuntu
+docker run -d --name bknd --network sysNet ubuntu
+
+docker run -d --name sql2 --network sysNet -e MYSQL_ROOT_PASSWORD=Prometeus.0 -e MYSQL_DATABASE=test_api -p 3306:3306 mysql:latest

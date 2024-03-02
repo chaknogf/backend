@@ -1,0 +1,20 @@
+docker network create rednet
+
+
+-- Docker mariadb
+
+docker run -d --name sql --network rednet -p 3306:3306 -e MYSQL_ROOT_PASSWORD=Prometeus.0 -v /home/matrix/mysql_datos:/mysql_datos mysql
+
+
+docker exec -it --network rednet mariadb bash
+docker exec -it mariadb-container bash
+
+docker exec -it bdatos bash
+
+source /docker-entrypoint-initdb.d/init.sql
+
+
+docker run -d --name phpmyadmin-container --network rednet -e PMA_ARBITRARY=1 -p 8080:80 phpmyadmin/phpmyadmin
+
+docker run -d --name phpmyadmin-container --network rednet -e PMA_ARBITRARY=1 -e PMA_HOST=nombre_del_contenedor_mariadb -e PMA_USER=root -e PMA_PASSWORD=Prometeus.0 -p 8080:80 phpmyadmin/phpmyadmin
+docker run -d --name phpmyadmin-container --network rednet -e PMA_ARBITRARY=1 -e PMA_HOST=bdatos -e PMA_USER=root -e PMA_PASSWORD=Prometeus.0 -p 8080:80 phpmyadmin/phpmyadmin

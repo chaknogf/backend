@@ -1,0 +1,34 @@
+version: '3'
+services:
+  # Contenedor para tu base de datos SQL (MySQL en este caso)
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: Prometeus.0
+      MYSQL_DATABASE: test_api
+    ports:
+      - "3306:3306"
+    networks:
+      - sysNet
+    command: ["sh", "-c", "mkdir -p /sistema"]
+    volumes:
+      - ./sistema:/sistema
+
+  
+
+  # Contenedor para 'bknd' en el puerto 8000
+  bknd:
+    image: fedora:latest
+    
+    networks:
+      - sysNet
+
+  # Contenedor para 'frnd' en el puerto 4200
+  frnd:
+    image: fedora:latest
+   
+    networks:
+      - sysNet
+
+networks:
+  sysNet:
