@@ -1,5 +1,5 @@
 import jwt
-from jwt import ExpiredSignatureError, DecodeError
+from jwt.exceptions import ExpiredSignatureError, DecodeError  # Ajuste en la importación
 from fastapi import HTTPException
 
 # Configura la clave secreta para firmar el token
@@ -20,6 +20,6 @@ def decode_token(token: str):
 def verify_token(token: str) -> bool:
     try:
         decoded_token = decode_token(token)
-        return decode_token(token) is not None
-    except HTTPException:
+        return decoded_token is not None  # Corregido para devolver True si el token es válido
+    except jwt.ExpiredSignatureError:  # Corregido para usar el nombre completo del error
         return False

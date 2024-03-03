@@ -52,6 +52,7 @@ app.include_router(cie10_router.router, dependencies=[Depends(check_jwt_token)])
 app.include_router(cons_nac_router.router, dependencies=[Depends(check_jwt_token)])
 app.include_router(procedimientos_medicos_router.router, dependencies=[Depends(check_jwt_token)])
 
+
 # # Define una ruta protegida
 # @app.get("/ruta-protegida", tags=["ruta protegida"], dependencies=[Depends(check_jwt_token)])
 # async def ruta_protegida():
