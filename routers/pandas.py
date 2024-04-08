@@ -473,6 +473,19 @@ async def excel_consultas(
                 row.especialidad = "Psicologia"
             elif row.especialidad == 7:
                 row.especialidad = "Nutricion"
+             #Convertir el valor de la columna 'servicio' a un texto descriptivo   
+            if row.servicio == 1:
+                row.servicio = "COEX"
+            elif row.servicio == 2:
+                row.servicio = "Encamamiento"
+            elif row.servicio == 3:
+                row.servicio = "Emergencia"
+            elif row.servicio == 4:
+                row.servicio = "SOP Emergencia"
+            elif row.servicio == 5:
+                row.servicio = "SOP Electiva"
+            elif row.servicio == 6:
+                row.servicio = "Otros"
 
         #convertir el valor de la columna tipo_consulta a un texto descriptivo
              # Convertir el valor de la columna 'procedimiento' a un texto descriptivo
