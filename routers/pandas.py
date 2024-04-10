@@ -10,7 +10,7 @@ from models.uisau import uisauModel
 from models.paciente import PacienteModel
 from models.procedimientos import ProceMedicosModel, CodigosProceModel
 from models.medicos import MedicosModel
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy.exc import SQLAlchemyError
 #from municipio import municipios
 
@@ -525,37 +525,43 @@ async def excel_consultas(
         raise HTTPException(status_code=500, detail=f"Error al consultar la base de datos: {error}")
     
 
-# def get_vista_censo_camas(fecha_inicio: str, fecha_final: str):
-#     try:
+@router.get("/censo_camas", tags=["Estadísticas"])
+async def censo_camas(
+    fecha_inicio: str = Query(None, title="Fecha inicial"),
+    fecha_final: str = Query(None, title="Fecha final"),
+):
+    try:
+        db = Session()
         
-#         db = Session()
-#         vista_censo_camas = db.query(VistaCensoCamas).filter(VistaCensoCamas.fecha_consulta.between(fecha_inicio, fecha_final)).all()
+        result = db.query(ConsultasModel).filter(ConsultasModel.fecha_consulta.between(fecha_inicio, fecha_final)).all()
+        if not result:
+            raise HTTPException(status_code=404, detail="No hay datos en el rango de fechas seleccionado")
         
-#         # Convertir el valor de la columna 'especialidad' a un texto descriptivo
-#         for row in vista_censo_camas:
-#             if row.especialidad == 1:
-#                 row.especialidad = "Medicina Interna"
-#             elif row.especialidad == 2:
-#                 row.especialidad = "Pediatria"
-#             elif row.especialidad == 3:
-#                 row.especialidad = "Ginecologia"
-#             elif row.especialidad == 4:
-#                 row.especialidad = "Cirugia"
-#             elif row.especialidad == 5:
-#                 row.especialidad = "Traumatologia"
-#             elif row.especialidad == 6:
-#                 row.especialidad = "Psicologia"
-#             elif row.especialidad == 7:
-#                 row.especialidad = "Nutricion"
+        # Crear un DataFrame vacío para almacenar la ocupación de camas por día
+        ocupacion_camas = pd.DataFrame(columns=['fecha', 'servicio', 'especialidad', 'ocupacion'])
 
-#         return vista_censo_camas
-#     finally:
-#         db.close()
+        # Iterar sobre cada paciente
+        for patient in result:
+            fecha_consulta = patient.fecha_consulta
+            fecha_egreso = patient.fecha_egreso if patient.fecha_egreso else datetime.now().date()
+            while fecha_consulta <= fecha_egreso:
+                # Calcular ocupación para esta fecha, servicio y especialidad
+                ocupacion_camas = ocupacion_camas.append({'fecha': fecha_consulta,
+                                                            'servicio': patient.servicio,
+                                                            'especialidad': patient.especialidad,
+                                                            'ocupacion': 1}, ignore_index=True)
+                fecha_consulta += timedelta(days=1)
 
-# @router.get("/censo_camas/", tags=["Estadísticas"])
-# async def censo_camas(fecha_inicio: str, fecha_final: str):
-    db = Session()
-    vista_censo_camas = get_vista_censo_camas(fecha_inicio, fecha_final, db)
-    if not vista_censo_camas:
-        raise HTTPException(status_code=404, detail="No se encontraron datos")
-    return vista_censo_camas
+        # Agrupar por fecha, servicio y especialidad y sumar la ocupación
+        ocupacion_camas = ocupacion_camas.groupby(['fecha', 'servicio', 'especialidad']).sum().reset_index()
+
+        # Ahora `ocupacion_camas` contiene la ocupación de camas por día para cada servicio y especialidad
+        # Puedes hacer lo que necesites con este DataFrame, como guardarlo en un archivo Excel o devolverlo como JSON
+        
+        # Aquí debes continuar con el código para guardar los resultados en un archivo Excel o devolverlos como JSON
+        # Ten en cuenta que necesitarás importar los módulos necesarios para manejar los DataFrames de Pandas y la creación de archivos Excel
+        
+    except SQLAlchemyError as error:
+        return {"error": f"Error al consultar la base de datos: {error}"}
+    finally:
+        db.close()
