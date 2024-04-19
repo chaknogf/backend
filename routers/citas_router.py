@@ -104,10 +104,12 @@ async def crear_cita(cita: Citas):
         # Verificar si ya existen 10 citas para la misma especialidad en la misma fecha
         citas_del_dia = db.query(CitasModel).filter(
             CitasModel.especialidad == cita.especialidad,
-            CitasModel.fecha == cita.fecha
+            CitasModel.fecha == cita.fecha,
+            CitasModel.tipo == cita.tipo
+            
         ).count()
         
-        if citas_del_dia >9:
+        if citas_del_dia > 9:
             return JSONResponse(status_code=400, content={"message": "Ya se han agendado 10 citas para esta especialidad en esta fecha"})
         
         # Verificar si ya existe una cita con la misma especialidad en la misma fecha
@@ -115,6 +117,7 @@ async def crear_cita(cita: Citas):
             CitasModel.expediente == cita.expediente,
             CitasModel.especialidad == cita.especialidad,
             CitasModel.fecha == cita.fecha,
+            #CitasModel.tipo ==cita.tipo
             
         ).first()
         
@@ -146,6 +149,7 @@ async def cita_especial(cita: Citas):
             CitasModel.expediente == cita.expediente,
             CitasModel.especialidad == cita.especialidad,
             CitasModel.fecha == cita.fecha,
+            CitasModel.tipo ==cita.tipo
             
         ).first()
         

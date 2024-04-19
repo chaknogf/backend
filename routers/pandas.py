@@ -533,35 +533,77 @@ async def censo_camas(
     try:
         db = Session()
         
-        result = db.query(ConsultasModel).filter(ConsultasModel.fecha_consulta.between(fecha_inicio, fecha_final)).all()
+        result = db.query(ConsultasModel)\
+                   .filter(ConsultasModel.fecha_consulta.between(fecha_inicio, fecha_final))\
+                   .filter(ConsultasModel.tipo_consulta==2)\
+                   .all()
+        
         if not result:
             raise HTTPException(status_code=404, detail="No hay datos en el rango de fechas seleccionado")
         
-        # Crear un DataFrame vacío para almacenar la ocupación de camas por día
-        ocupacion_camas = pd.DataFrame(columns=['fecha', 'servicio', 'especialidad', 'ocupacion'])
+        # Convertir los resultados de la consulta en un DataFrame de Pandas
+        df = pd.DataFrame([{
+            'fecha': paciente.fecha_consulta,
+            'servicio': paciente.servicio,
+            'especialidad': paciente.especialidad,
+            'ocupacion': 1
+        } for paciente in result])
 
-        # Iterar sobre cada paciente
-        for patient in result:
-            fecha_consulta = patient.fecha_consulta
-            fecha_egreso = patient.fecha_egreso if patient.fecha_egreso else datetime.now().date()
-            while fecha_consulta <= fecha_egreso:
-                # Calcular ocupación para esta fecha, servicio y especialidad
-                ocupacion_camas = ocupacion_camas.append({'fecha': fecha_consulta,
-                                                            'servicio': patient.servicio,
-                                                            'especialidad': patient.especialidad,
-                                                            'ocupacion': 1}, ignore_index=True)
-                fecha_consulta += timedelta(days=1)
+        # Convertir los valores numéricos a texto descriptivo
+        descripcion_especialidad = {
+            1: "Medicina Interna",
+            2: "Pediatria",
+            3: "Ginecologia",
+            4: "Cirugia",
+            5: "Traumatologia",
+            6: "Psicologia",
+            7: "Nutricion"
+        }
 
-        # Agrupar por fecha, servicio y especialidad y sumar la ocupación
-        ocupacion_camas = ocupacion_camas.groupby(['fecha', 'servicio', 'especialidad']).sum().reset_index()
+        descripcion_servicio = {
+            1: "SOP",
+            2: "Maternidad",
+            3: "Ginecologia",
+            4: "Cirugia",
+            5: "Cirugia pedia",
+            6: "Trauma",
+            7: "Trauma pedia",
+            8: "CRN",
+            9: "Pedia",
+            10: "RN",
+            11: "Neonatos",
+            12: "Medicina Hombres",
+            13: "Medicina Mujeres",
+            14: "vsvs",
+            15: "Covid",
+            16: "Labor & parto",
+            17: "area roja emergencia",
+            18: "ucin"
+            # Añade más descripciones de servicios según sea necesario
+        }
 
-        # Ahora `ocupacion_camas` contiene la ocupación de camas por día para cada servicio y especialidad
-        # Puedes hacer lo que necesites con este DataFrame, como guardarlo en un archivo Excel o devolverlo como JSON
-        
-        # Aquí debes continuar con el código para guardar los resultados en un archivo Excel o devolverlos como JSON
-        # Ten en cuenta que necesitarás importar los módulos necesarios para manejar los DataFrames de Pandas y la creación de archivos Excel
-        
+        df['especialidad'] = df['especialidad'].map(descripcion_especialidad)
+        df['servicio'] = df['servicio'].map(descripcion_servicio)
+
+        # Escribir el DataFrame en un archivo Excel
+        excel_io = BytesIO()
+        df.to_excel(excel_io, index=False)
+
+        # Configurar los encabezados de la respuesta para indicar un archivo Excel
+        headers = {
+            "Content-Disposition": "attachment; filename=censo_camas.xlsx",
+            "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        }
+
+        # Devolver una StreamingResponse con el archivo Excel
+        excel_io.seek(0)
+        return StreamingResponse(io.BytesIO(excel_io.read()), headers=headers)
+
     except SQLAlchemyError as error:
         return {"error": f"Error al consultar la base de datos: {error}"}
     finally:
         db.close()
+        
+        
+
+   
