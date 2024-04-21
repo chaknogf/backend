@@ -310,23 +310,14 @@ def buscar_citaId(id: int):
         db.close()
 
 @router.get("/cita/tabla/", tags=["Citas"])
-def tablaCitas(data: str, especialidad: int):
+def tablaCitas(fecha: str, especialidad: int, tipo: int):
     try:
         db = Session()
-        NoEncontrado = [{
-            "id": None,
-            "fecha": None,
-            "expediente": None,
-            "especialidad": None,
-            "fecha_cita": None,
-            "nota": None,
-            "tipo": None,
-            "name": "No hay citas"
-        }]
+        NoEncontrado = []
         result = (
             db.query(CitasModel, func.concat(PacienteModel.nombre, " ", PacienteModel.apellido).label("name"))
             .join(CitasModel.pacientes)
-            .filter(CitasModel.fecha == data , CitasModel.especialidad == especialidad)
+            .filter(CitasModel.fecha == fecha , CitasModel.especialidad == especialidad, CitasModel.tipo == tipo)
             .all()
             )
             
@@ -337,7 +328,7 @@ def tablaCitas(data: str, especialidad: int):
             {**cita.__dict__, "name": name} for cita, name in result
         ]
             
-        print(f"expediente: {data} datetime: {now} CONSULTADO")
+        print(f"expediente: {fecha} datetime: {now} CONSULTADO")
         return JSONResponse(status_code=200, content=jsonable_encoder(cita_dict))
     except SQLAlchemyError as error:
         raise HTTPException(status_code=500, detail=f"Error al consultar paciente: {error}")
@@ -346,11 +337,30 @@ def tablaCitas(data: str, especialidad: int):
         
         
 @router.get("/citasVigentes", tags=["Citas"])
-def Vigentes(especialidad: int):
+def Vigentes(especialidad: int, tipo: int):
     try:
         db = Session()
          # Consulta la vista filtrando por especialidad
-        citas = db.query(VistaCitas).filter(VistaCitas.dia >= cadena_fecha, VistaCitas.especialidad == especialidad).all()
+        citas = db.query(VistaCitas).filter(VistaCitas.dia >= cadena_fecha, VistaCitas.especialidad == especialidad, VistaCitas.tipo == tipo).all()
+        
+        
+        if not citas:
+            raise HTTPException(status_code=404, detail="No se encontraron citas para esta especialidad.")
+        
+        citas_dict = [{"id": cita.id, "especialidad": cita.especialidad, "dia": cita.dia, "total_citas": cita.total_citas} for cita in citas]
+    
+        return JSONResponse(status_code=200, content=citas_dict)
+    except SQLAlchemyError as error:
+        raise HTTPException(status_code=500, detail=f"Error al consultar citas: {error}")
+    finally:
+        db.close()
+        
+@router.get("/citas_disponible", tags=["Citas"])
+def Vigentes(especialidad: int, tipo: int, fecha: str):
+    try:
+        db = Session()
+         # Consulta la vista filtrando por especialidad
+        citas = db.query(VistaCitas).filter(VistaCitas.dia == fecha, VistaCitas.especialidad == especialidad, VistaCitas.tipo == tipo).all()
         
         
         if not citas:

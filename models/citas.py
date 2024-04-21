@@ -38,13 +38,14 @@ def vistaC():
 SELECT
     ROW_NUMBER() OVER () AS id,
     especialidad,
+    tipo,
     DATE_FORMAT(fecha, '%Y-%m-%d') AS dia,
     COUNT(*) AS total_citas
 FROM
     citas
-
 GROUP BY
-    especialidad, dia
+    especialidad, tipo, dia;
+
 ''')
         cursor = db.cursor()
         cursor.execute(command_vista)
@@ -95,6 +96,7 @@ class VistaCitas(Base):
     
     id = Column(Integer, primary_key=True)
     especialidad = Column(Integer)
+    tipo = Column(Integer)
     dia = Column(String)
     total_citas = Column(Integer)
      
