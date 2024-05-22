@@ -44,6 +44,7 @@ Tpacientes = ('''
   `conyugue` VARCHAR(100) DEFAULT NULL,
   `created_by` varchar(8) DEFAULT NULL,
   `fechaDefuncion` varchar(10) DEFAULT NULL,
+  `exp_ref` int DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE KEY `expediente_unico` (`expediente`)
@@ -120,6 +121,7 @@ class PacienteModel(Base):
     fechaDefuncion = Column(String(10))
     gemelo = Column(String(2))
     conyugue = Column(String(100))
+    exp_ref = Column(Integer)
     # created_at = Column(String(25))
     # update_at = Column(String(25))
     

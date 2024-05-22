@@ -80,6 +80,7 @@ class Paciente(BaseModel):
     fechaDefuncion: str | None = None
     gemelo: str | None = None
     conyugue: str | None = None
+    exp_ref: int | None = None
     
     
 
@@ -239,6 +240,7 @@ async def actualizar_paciente( Pacient: Paciente, exp: int):
         result.fechaDefuncion = Pacient.fechaDefuncion
         result.gemelo = Pacient.gemelo
         result.conyugue = Pacient.conyugue
+        result.exp_ref = Pacient.exp_ref
         
         
       
@@ -427,4 +429,53 @@ async def filtro_p(
     except Exception as e:
         # Manejar otros errores inesperados
         return {"error": str(e)}
+    
+
+@router.put("/trasladar/{id}", tags=["Pacientes"])
+async def trasladar_expediente( Pacient: Paciente, id: int):
+    try:
+        Db = Session()
+        result = Db.query(PacienteModel).filter(PacienteModel.id == id).first()
+        if not result:
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        result.expediente = Pacient.expediente
+        result.nombre = Pacient.nombre
+        result.apellido = Pacient.apellido
+        result.dpi = Pacient.dpi
+        result.pasaporte = Pacient.pasaporte
+        result.sexo = Pacient.sexo
+        result.nacimiento = Pacient.nacimiento
+        result.nacionalidad = Pacient.nacionalidad
+        result.depto_nac = Pacient.depto_nac
+        result.lugar_nacimiento = Pacient.lugar_nacimiento
+        result.estado_civil = Pacient.estado_civil
+        result.educacion = Pacient.educacion
+        result.pueblo = Pacient.pueblo
+        result.idioma = Pacient.idioma
+        result.ocupacion = Pacient.ocupacion
+        result.direccion = Pacient.direccion
+        result.municipio = Pacient.municipio
+        result.depto = Pacient.depto
+        result.telefono = Pacient.telefono
+        result.email = Pacient.email
+        result.padre = Pacient.padre
+        result.madre = Pacient.madre
+        result.responsable = Pacient.responsable
+        result.parentesco = Pacient.parentesco
+        result.dpi_responsable = Pacient.dpi_responsable
+        result.telefono_responsable = Pacient.telefono_responsable
+        result.estado = Pacient.estado
+        result.exp_madre = Pacient.exp_madre
+        result.created_by = Pacient.created_by
+        result.fechaDefuncion = Pacient.fechaDefuncion
+        result.gemelo = Pacient.gemelo
+        result.conyugue = Pacient.conyugue
+        result.exp_ref = Pacient.exp_ref
+        
+        
+      
+        Db.commit()
+        return JSONResponse(status_code=201, content={"message": "Actualización Realizada"})
+    except SQLAlchemyError as error:
+        return {"message": f"Error al consultar paciente: {error}"}
     
