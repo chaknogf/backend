@@ -12,6 +12,7 @@ from models.procedimientos import ProceMedicosModel, CodigosProceModel
 from models.medicos import MedicosModel
 from datetime import datetime, timedelta
 from sqlalchemy.exc import SQLAlchemyError
+import re
 #from municipio import municipios
 
 
@@ -207,6 +208,26 @@ async def excel_consultas(
 
         # Crear un DataFrame de Pandas con los resultados
         df = pd.DataFrame([row.__dict__ for row in result])
+        
+       # Añadir la columna 'dias_ocupados'
+        fecha_actual = pd.to_datetime(datetime.now().date())
+        df['fecha_egreso'] = pd.to_datetime(df['fecha_egreso']).fillna(fecha_actual)
+        df['fecha_consulta'] = pd.to_datetime(df['fecha_consulta'])
+        df['dias_ocupados'] = (df['fecha_egreso'] - df['fecha_consulta']).dt.days
+
+        # Convertir la columna 'edad' a días y luego clasificarla en grupos
+        df['edad_dias'] = df['edad'].apply(age_to_days)
+        df['grupo_edad'] = df['edad_dias'].apply(classify_age_group)
+
+        # Especificar el orden deseado de las columnas
+        ordered_columns = [
+            'id', 'hoja_emergencia', 'expediente', 'fecha_consulta', 'hora', 'nombres', 'apellidos', 
+            'nacimiento', 'edad', 'sexo', 'dpi', 'direccion', 'acompa', 'parente', 'telefono', 'nota', 
+            'especialidad', 'servicio', 'status', 'fecha_egreso', 'fecha_recepcion', 'tipo_consulta', 
+            'prenatal', 'lactancia', 'dx', 'folios', 'medico', 'archived_by', 'created_by', 'dias_ocupados', 'grupo_edad'
+        ]
+        df = df[ordered_columns]
+        
 
         # Crear un objeto BytesIO para almacenar el archivo Excel
         excel_io = BytesIO()
@@ -605,5 +626,32 @@ async def censo_camas(
         db.close()
         
         
+# Función para convertir la edad en años, meses y días a días totales
+def age_to_days(age_str):
+    match = re.match(r'(\d+) años (\d+) meses (\d+) días', age_str)
+    if match:
+        years, months, days = map(int, match.groups())
+        total_days = years * 365 + months * 30 + days
+        return total_days
+    return None
+
+# Función para clasificar la edad en grupos
+def classify_age_group(days):
+    if days <= 28:
+        return "Neonato"
+    elif 28 < days <= 365:
+        return "Lactante"
+    elif 365 < days <= 5 * 365:
+        return "Primera infancia"
+    elif 5 * 365 < days <= 12 * 365:
+        return "Segunda infancia"
+    elif 12 * 365 < days <= 18 * 365:
+        return "Adolescencia"
+    elif 18 * 365 < days <= 40 * 365:
+        return "Joven adulto"
+    elif 40 * 365 < days <= 64 * 365:
+        return "Adulto medio"
+    else:
+        return "Adulto mayor"
 
    

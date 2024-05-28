@@ -159,9 +159,11 @@ class VistaPersona(Base):
     depto = Column(Integer)
     direccion = Column(String)
     gemelo = Column(String)
+    exp_ref = Column(Integer)
     
     
-#CREATE VIEW vista_paciente AS SELECT id, nombre, apellido, expediente, nacimiento  FROM pacientes;    
+#CREATE VIEW vista_paciente AS SELECT id, nombre, apellido, expediente, nacimiento, exp_ref  FROM pacientes;    
+#CREATE VIEW vista_paciente AS SELECT id, nombre, apellido, expediente, nacimiento, dpi, sexo, estado, gemelo, exp_ref  FROM pacientes;
 #SELECT table_name FROM information_schema.views WHERE table_schema = 'test_api';
 
-#CREATE VIEW vista_persona AS SELECT id, nombre, apellido, expediente, nacimiento, dpi, sexo, direccion, municipio, depto, gemelo  FROM pacientes
+#CREATE VIEW vista_persona AS SELECT id, nombre, apellido, expediente, exp_ref, nacimiento, dpi, sexo, direccion, municipio, depto, gemelo  FROM pacientes

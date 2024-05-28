@@ -479,3 +479,31 @@ async def trasladar_expediente( Pacient: Paciente, id: int):
     except SQLAlchemyError as error:
         return {"message": f"Error al consultar paciente: {error}"}
     
+
+@router.get("filtrar_paciente/", tags=["Pacientes"])
+async def filtro(
+    expediente: int = Query(None, description="Expediente"),
+    nombre: str = Query(None, description="nombre"),
+    apellido: str = Query(None, description="apellido"),
+    dpi: int = Query(None, description="DPI"),
+    exp_ref: int = Query(None, description="expediente_referencia") 
+):
+    try: 
+        db = Session()
+        query = db.query(PacienteModel)
+        
+        if expediente:
+            query = query.filter(PacienteModel.expediente == expediente)
+        if nombre:
+            query = query.filter(PacienteModel.nombre.ilike(f"%{nombre}"))
+        if apellido:
+            query = query.filter(PacienteModel.apellido.ilike(f"%{apellido}"))
+        if dpi:
+            query = query.filter(PacienteModel.dpi.ilike(f"%{dpi}"))
+        if exp_ref:
+            query = query.filter(PacienteModel.exp_ref == exp_ref)
+            
+        result = query.all()
+        return result
+    except Exception as err:
+        return {"error": str(err)}
