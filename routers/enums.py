@@ -10,6 +10,7 @@ import sys
 class GeneroEnum(str, Enum):
     Masculino = 'M'
     Femenino = 'F'
+    Indefinido = 'I'
     
 class EstadoEnum(str, Enum):
     Vivo = 'v'
