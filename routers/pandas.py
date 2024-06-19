@@ -115,6 +115,30 @@ async def obtener_estadisticas(
     finally:
         db.close()
 
+@router.get("/report_renap/", tags=["Estadísticas"])
+async def report_renap(
+    fecha_inicio: str = Query(None, title="Fecha inicial"),
+    fecha_final: str = Query(None, title="Fecha final")
+):
+    try:
+        db = Session()
+        
+        #Obtener datos de la base
+        result = db.query(ConsultasModel).filter(ConsultasModel.fecha_egreso.between(fecha_inicio, fecha_final)).filter(ConsultasModel.servicio == 10).all()
+        
+        
+         # Verificar si hay datos en el rango de fechas
+        if not result:
+            raise HTTPException(status_code=404, detail="No hay datos en el rango de fechas seleccionado")
+        
+        
+    except SQLAlchemyError as error:
+        raise HTTPException(status_code=500, detail=f"Error al consultar la base de datos: {error}")
+        
+       
+
+        
+
 
 @router.get("/report_consult/", tags=["Estadísticas"])
 async def excel_consultas(
@@ -209,16 +233,21 @@ async def excel_consultas(
         # Crear un DataFrame de Pandas con los resultados
         df = pd.DataFrame([row.__dict__ for row in result])
         
-       # Añadir la columna 'dias_ocupados'
+       # Limpiar y validar fechas
         fecha_actual = pd.to_datetime(datetime.now().date())
-        df['fecha_egreso'] = pd.to_datetime(df['fecha_egreso']).fillna(fecha_actual)
-        df['fecha_consulta'] = pd.to_datetime(df['fecha_consulta'])
+        df['fecha_consulta'] = pd.to_datetime(df['fecha_consulta'], errors='coerce')
+        df['fecha_egreso'] = pd.to_datetime(df['fecha_egreso'], errors='coerce').fillna(fecha_actual)
+
+        # Filtrar filas con fechas no válidas
+        df = df.dropna(subset=['fecha_consulta', 'fecha_egreso'])
+
+        # Añadir la columna 'dias_ocupados'
         df['dias_ocupados'] = (df['fecha_egreso'] - df['fecha_consulta']).dt.days
 
         # Convertir la columna 'edad' a días y luego clasificarla en grupos
         df['edad_dias'] = df['edad'].apply(age_to_days)
         df['grupo_edad'] = df['edad_dias'].apply(classify_age_group)
-
+        
         # Especificar el orden deseado de las columnas
         ordered_columns = [
             'id', 'hoja_emergencia', 'expediente', 'fecha_consulta', 'hora', 'nombres', 'apellidos', 
