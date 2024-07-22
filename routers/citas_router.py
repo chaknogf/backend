@@ -26,6 +26,8 @@ class Citas(BaseModel):
     fecha_cita: date | None = None
     nota: str | None = None
     tipo: int | None = None
+    lab: int | None = None
+    fecha_lab: date | None = None
     created_by: str | None = None
 
 hoy = date.today()
@@ -173,6 +175,8 @@ async def actualizar_cita(cita: Citas, id: int):
             return JSONResponse(status_code=404, content={"message": "No encontrado"})
         result.nota = cita.nota
         result.tipo = cita.tipo
+        result.lab = cita.lab
+        result.fecha_lab = cita.fecha_lab
         result.fecha_cita = cita.fecha_cita
         result.created_by = cita.created_by
         Db.commit()

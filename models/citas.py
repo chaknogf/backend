@@ -20,6 +20,8 @@ Tcitas = ('''
   `fecha_cita` date DEFAULT NULL,
   `nota` varchar(255) DEFAULT NULL,
   `tipo` int DEFAULT NULL,
+  `lab` int DEFAULT NULL,
+  `fecha_lab` date DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `created_by` varchar(8) DEFAULT NULL,
@@ -86,6 +88,8 @@ class CitasModel(Base):
     fecha_cita = Column(Date)
     nota = Column(String(255)) 
     tipo = Column(Integer)
+    lab = Column(Integer(1))
+    fecha_lab = Column(Date)
     created_by = Column(String(8))
     
  # Establece la relación con la tabla de pacientes
