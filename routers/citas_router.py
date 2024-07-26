@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from database.database import engine, Session, Base
 from database import database
 from models.citas import CitasModel , VistaCitas
@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import func, select, text
 from sqlalchemy.exc import SQLAlchemyError
+import pandas as pd
 
 router = APIRouter()
 
@@ -95,7 +96,20 @@ def cantidad_citas_diarias(especialidad: int):
         raise HTTPException(status_code=500, detail=f"Error al consultar citas: {error}")
     finally:
         db.close()
+        
 
+@router.get("/cita_lab/{fecha_cita}", tags=["Citas"])
+async def cita_lab(fecha_cita: str):
+    #parsear el input
+    input_fecha = datetime.strptime(fecha_cita, '%Y-%m-%d').date()
+    
+    #calculo previo 2 dias habiles
+    dia_habil = pd.date_range(end=input_fecha - timedelta(days=2), periods=2, freq='B').to_pydatetime().tolist()
+    
+    dos_dias_habiles_antes = dia_habil[-1].date()
+    
+    return {"fecha": str(dos_dias_habiles_antes)}
+    
 
 
 #Post conectado a SQL

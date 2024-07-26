@@ -88,7 +88,7 @@ class CitasModel(Base):
     fecha_cita = Column(Date)
     nota = Column(String(255)) 
     tipo = Column(Integer)
-    lab = Column(Integer(1))
+    lab = Column(Integer)
     fecha_lab = Column(Date)
     created_by = Column(String(8))
     
