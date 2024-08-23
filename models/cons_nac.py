@@ -21,7 +21,7 @@ Tcons_nac = ('''
     `passport` VARCHAR(30) DEFAULT NULL,
     `libro` INT DEFAULT NULL,
     `folio` INT DEFAULT NULL,
-    `partida` INT DEFAULT NULL,
+    `partida` VARCHAR(10) DEFAULT NULL,
     `depto` INT DEFAULT NULL,    
     `muni` INT DEFAULT NULL,
     `edad` INT DEFAULT NULL,
@@ -77,7 +77,7 @@ class Cons_NacModel(Base):
     passport = Column(String(30))
     libro = Column(Integer)
     folio = Column(Integer)
-    partida = Column(Integer)
+    partida = Column(String(10))
     depto = Column(Integer)
     muni = Column(Integer)
     edad = Column(Integer)

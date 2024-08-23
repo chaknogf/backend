@@ -59,7 +59,7 @@ class ConsNac(BaseModel):
     passport: str | None = None
     libro: int | None = None
     folio: int | None = None
-    partida: int | None = None
+    partida: str | None = None
     depto: int | None = None
     muni: int | None = None
     edad: int | None = None
