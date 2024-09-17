@@ -39,7 +39,7 @@ class uisau(BaseModel):
     nota: str | None = None
     estudios: str | None = None
     evolucion: str | None = None
-    recetado_por: str | None = None
+    receta_por: str | None = None
     id_consulta: int | None = None
     created_by: str | None = None
     update_by: str | None = None
