@@ -39,9 +39,20 @@ class uisau(BaseModel):
     nota: str | None = None
     estudios: str | None = None
     evolucion: str | None = None
+    receta_por: str | None = None
     id_consulta: int | None = None
     created_by: str | None = None
     update_by: str | None = None
+    shampoo: bool | None = None
+    toalla: bool | None = None
+    peine: bool | None = None
+    jabon: bool | None = None
+    cepillo_dientes: bool | None = None
+    pasta_dental: bool | None = None
+    sandalias: bool | None = None
+    agua: bool | None = None
+    papel: bool | None = None
+    panales: bool | None = None
    
     
     

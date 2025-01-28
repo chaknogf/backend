@@ -34,6 +34,17 @@ Tuisau = ('''
     `nota` TEXT DEFAULT NULL,
     `estudios` VARCHAR(255) DEFAULT NULL,
     `evolucion` TEXT DEFAULT NULL,
+    `recetado_por` VARCHAR(2),
+    `shampoo` TINYINT(1) DEFAULT 0,
+    `toalla` TINYINT(1) DEFAULT 0,
+    `peine` TINYINT(1) DEFAULT 0,
+    `jabon` TINYINT(1) DEFAULT 0,
+    `cepillo_dientes` TINYINT(1) DEFAULT 0,
+    `pasta_dental` TINYINT(1) DEFAULT 0,
+    `sandalias` TINYINT(1) DEFAULT 0,
+    `agua` TINYINT(1) DEFAULT 0,
+    `papel` TINYINT(1) DEFAULT 0,
+    `panales` TINYINT(1) DEFAULT 0
     `id_consulta` INT DEFAULT NULL,
     `created_by` VARCHAR(8) DEFAULT NULL,
     `update_by` VARCHAR(8) DEFAULT NULL,
@@ -70,7 +81,7 @@ class uisauModel(Base):
     situacion = Column(Integer)
     lugar_referencia = Column(Integer)
     fecha_referencia = Column(Date)
-    estadia = Column(Integer)
+    estadia = Column(Integer)   
     cama = Column(Integer)
     especialidad = Column(Integer)
     servicio = Column(Integer)
@@ -85,6 +96,17 @@ class uisauModel(Base):
     nota = Column(Text)
     estudios = Column(Text)
     evolucion = Column(Text)
+    receta_por = Column(String(2))
+    shampoo = Column(Boolean)
+    toalla = Column(Boolean)
+    peine = Column(Boolean)
+    jabon = Column(Boolean)
+    cepillo_dientes = Column(Boolean)
+    pasta_dental = Column(Boolean)
+    sandalias = Column(Boolean)
+    agua = Column(Boolean)
+    papel = Column(Boolean)
+    panales = Column(Boolean)
     id_consulta = Column(Integer)
     created_by = Column(String(8))
     update_by = Column(String(8))
