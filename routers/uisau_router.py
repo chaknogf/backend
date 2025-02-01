@@ -7,7 +7,7 @@ from database import database
 from models.uisau import uisauModel
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy import func, select
+from sqlalchemy import func, select, desc
 from sqlalchemy.exc import SQLAlchemyError
 
 router = APIRouter()
@@ -17,6 +17,7 @@ now = datetime.now()
 
 class uisau(BaseModel):
     id: int
+    consulta_id: int
     expediente: int | None = None
     nombres: str | None = None
     apellidos: str | None = None
@@ -53,6 +54,11 @@ class uisau(BaseModel):
     agua: bool | None = None
     papel: bool | None = None
     panales: bool | None = None
+    dxA: str | None = None
+    dxB: str | None = None
+    dxC: str | None = None
+    dxD: str | None = None
+    dxE: str | None = None
    
     
     
@@ -83,6 +89,19 @@ def buscar_id(id: int):
         return {"message": f"Error al consultar: {error}"}
     finally:
         print(f"id: {id} datetime:{now} CONSULTADO")
+        
+@router.get("/uisau_report/", tags=["UISAU"])
+def reporte_fecha(fecha: str):
+    try:
+        db = Session()
+        result = db.query(bModel).filter(uisauModel.fecha == fecha).all()
+        if not result:
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        return JSONResponse(status_code=200, content=jsonable_encoder(result))
+    except SQLAlchemyError as error:
+        return {"message": f"Error al consultar: {error}"}
+    finally:
+        print(f"fecha: {fecha} datetime:{now} CONSULTADO")
         
 @router.get("/infos/", tags=["UISAU"])
 def buscar_id(consulta: int):
@@ -152,7 +171,7 @@ async def filtro(
         if estadia:
             query = query.filter(bModel.estadia == estadia)
 
-        result = query.all()
+        result = query.order_by(desc(bModel.id)).all()
         return result
     except Exception as e:
         return {"error": str(e)}    

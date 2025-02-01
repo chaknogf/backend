@@ -46,6 +46,11 @@ Tuisau = ('''
     `papel` TINYINT(1) DEFAULT 0,
     `panales` TINYINT(1) DEFAULT 0
     `id_consulta` INT DEFAULT NULL,
+    `dxA` VARCHAR(20) DEFAULT NULL,
+    `dxB` VARCHAR(20) DEFAULT NULL,
+    `dxC` VARCHAR(20) DEFAULT NULL,
+    `dxD` VARCHAR(20) DEFAULT NULL,
+    `dxE` VARCHAR(20) DEFAULT NULL,
     `created_by` VARCHAR(8) DEFAULT NULL,
     `update_by` VARCHAR(8) DEFAULT NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -74,6 +79,7 @@ def crear_tabla():
 class uisauModel(Base):
     __tablename__ = "uisau"
     id = Column(Integer, primary_key=True)
+    consulta_id = Column(Integer)
     expediente = Column(Integer)
     nombres = Column(String(100))
     apellidos = Column(String(100))
@@ -107,6 +113,11 @@ class uisauModel(Base):
     agua = Column(Boolean)
     papel = Column(Boolean)
     panales = Column(Boolean)
+    dxA = Column(String(20))
+    dxB = Column(String(20))
+    dxC = Column(String(20))
+    dxD = Column(String(20))
+    dxE = Column(String(20))
     id_consulta = Column(Integer)
     created_by = Column(String(8))
     update_by = Column(String(8))
