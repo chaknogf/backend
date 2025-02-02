@@ -2,7 +2,7 @@ from database import database
 import mysql.connector
 from datetime import datetime
 from database.database import Base
-from sqlalchemy import Column, Integer, String, Date
+from sqlalchemy import Column, Integer, String, Date, Time
 from sqlalchemy.orm import relationship
 
 db = database.get_database_connection()
@@ -44,6 +44,7 @@ Tpacientes = ('''
   `conyugue` VARCHAR(100) DEFAULT NULL,
   `created_by` varchar(8) DEFAULT NULL,
   `fechaDefuncion` varchar(10) DEFAULT NULL,
+  `hora_defuncion` time DEFAULT NULL,
   `exp_ref` int DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -119,6 +120,7 @@ class PacienteModel(Base):
     exp_madre = Column(Integer)
     created_by = Column(String(8))
     fechaDefuncion = Column(String(10))
+    hora_defuncion = Column(Time)
     gemelo = Column(String(2))
     conyugue = Column(String(100))
     exp_ref = Column(Integer)
