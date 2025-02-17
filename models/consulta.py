@@ -2,7 +2,7 @@ from database import database
 import mysql.connector
 from datetime import datetime
 from database.database import Base
-from sqlalchemy import Column, Integer, String, Date, Time, ForeignKey, DateTime, TIMESTAMP
+from sqlalchemy import Column, Integer, String, Date, Time, ForeignKey, DateTime, TIMESTAMP, Boolean
 from sqlalchemy.orm import relationship
 
 db = database.get_database_connection()
@@ -123,6 +123,14 @@ class ConsultasModel(Base):
     created_by = Column(String(8))
     created_at = Column(String(25))
     updated_at = Column(String(25))
+    bomberos = Column(Boolean)
+    transito = Column(Boolean)
+    arma_blanca = Column(Boolean)
+    arma_fuego = Column(Boolean)
+    estudiante_publica = Column(Boolean)
+    accidente_laboral = Column(Boolean)
+    personal_hospital = Column(Boolean)
+    reserva = Column(Boolean)
     
    
     

@@ -7,7 +7,7 @@ from database import database
 from models.uisau import uisauModel
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy import func, select
+from sqlalchemy import func, select, desc
 from sqlalchemy.exc import SQLAlchemyError
 
 router = APIRouter()
@@ -17,6 +17,7 @@ now = datetime.now()
 
 class uisau(BaseModel):
     id: int
+    consulta_id: int
     expediente: int | None = None
     nombres: str | None = None
     apellidos: str | None = None
@@ -53,6 +54,18 @@ class uisau(BaseModel):
     agua: bool | None = None
     papel: bool | None = None
     panales: bool | None = None
+    dxA: str | None = None
+    dxB: str | None = None
+    dxC: str | None = None
+    dxD: str | None = None
+    dxE: str | None = None
+    toalla_humeda: bool | None = None
+    ropa_bebe: bool | None = None
+    ropa_interior: bool | None = None
+    panal_bebe: bool | None = None
+    panal_adulto: bool | None = None
+    babero: bool | None = None
+    otros: bool | None = None
    
     
     
@@ -84,6 +97,19 @@ def buscar_id(id: int):
     finally:
         print(f"id: {id} datetime:{now} CONSULTADO")
         
+@router.get("/uisau_report/", tags=["UISAU"])
+def reporte_fecha(fecha: str):
+    try:
+        db = Session()
+        result = db.query(bModel).filter(uisauModel.fecha == fecha).all()
+        if not result:
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        return JSONResponse(status_code=200, content=jsonable_encoder(result))
+    except SQLAlchemyError as error:
+        return {"message": f"Error al consultar: {error}"}
+    finally:
+        print(f"fecha: {fecha} datetime:{now} CONSULTADO")
+        
 @router.get("/infos/", tags=["UISAU"])
 def buscar_id(consulta: int):
     try:
@@ -96,6 +122,8 @@ def buscar_id(consulta: int):
         return {"message": f"Error al consultar: {error}"}
     finally:
         print(f"id: {id} datetime:{now} CONSULTADO")
+        
+    
         
 
 @router.get("/filter/", tags=["UISAU"])
@@ -110,7 +138,8 @@ async def filtro(
     nombres: str = Query(None, description="Nombres"),
     apellidos: str = Query(None, description="Apellidos"),
     usuario: int = Query(None, description="Usuario de UISAU"),
-    estadia: int = Query(None, description="Estadia de paciente")
+    estadia: int = Query(None, description="Estadia de paciente"),
+    servicio: int = Query(None, description="Servicio de paciente")
     
                 ):
     try:
@@ -151,8 +180,11 @@ async def filtro(
             
         if estadia:
             query = query.filter(bModel.estadia == estadia)
+            
+        if servicio:
+            query = query.filter(bModel.servicio == servicio)
 
-        result = query.all()
+        result = query.order_by(desc(bModel.id)).all()
         return result
     except Exception as e:
         return {"error": str(e)}    
@@ -190,6 +222,39 @@ async def editar(edit: uisau, id: int):
         result.telefono = edit.telefono
         result.informacion = edit.informacion
         result.nota = edit.nota
+        result.estudios = edit.estudios
+        result.evolucion = edit.evolucion
+        result.receta_por = edit.receta_por
+        result.shampoo = edit.shampoo
+        result.toalla = edit.toalla
+        result.peine = edit.peine
+        result.jabon = edit.jabon
+        result.agua = edit.agua
+        result.papel = edit.papel
+        result.panales = edit.panales
+        result.dxA = edit.dxA
+        result.dxB = edit.dxB
+        result.dxC = edit.dxC
+        result.dxD = edit.dxD
+        result.dxE = edit.dxE
+        result.cepillo_dientes = edit.cepillo_dientes
+        result.pasta_dental = edit.pasta_dental
+        result.cama = edit.cama
+        result.estadia = edit.estadia
+        result.servicio = edit.servicio
+        result.lugar_referencia = edit.lugar_referencia
+        result.nota = edit.nota
+        result.especialidad = edit.especialidad
+        result.situacion = edit.situacion
+        result.id_consulta = edit.id_consulta
+        result.toalla_humeda = edit.toalla_humeda
+        result.ropa_bebe = edit.ropa_bebe
+        result.ropa_interior = edit.ropa_interior
+        result.panal_bebe = edit.panal_bebe
+        result.panal_adulto = edit.panal_adulto
+        result.babero = edit.babero
+        result.otros = edit.otros
+        
         db.commit()
         return JSONResponse(status_code=201, content={"message": "Actualizacion realizada"})
     except SQLAlchemyError as error:

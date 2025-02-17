@@ -282,100 +282,139 @@ async def excel_consultas(
 
 @router.get("/report_uisau/", tags=["Estadísticas"])
 async def excel_uisau(
-    fecha_inicio: str = Query(None, title="Fecha inicial"),
-    fecha_final: str = Query(None, title="Fecha final"),
+    fecha_reporte: str = Query(..., title="Fecha reporte"),  # Fecha es obligatoria
 ):
     try:
-        db = Session()
+        db = Session()  # Asegúrate de que esta sea la forma correcta de obtener la sesión de la base de datos
 
         # Obtener datos de la base de datos en el rango de fechas
-        result = db.query(uisauModel).filter(uisauModel.fecha.between(fecha_inicio, fecha_final)).all()
+        result = db.query(uisauModel).filter(uisauModel.fecha == fecha_reporte).all()
 
         # Verificar si hay datos en el rango de fechas
         if not result:
             raise HTTPException(status_code=404, detail="No hay datos en el rango de fechas seleccionado")
 
-       # Corregir datos según necesidades específicas
+        # Lista para almacenar los datos procesados
+        processed_data = []
+
+        # Procesar cada fila de resultados
         for row in result:
-            # Convertir el valor de la columna 'status' a un texto descriptivo
-            if row.status == 1:
-                row.status = "Activo"
-            elif row.status == 2:
-                row.status = "Archivado"
+            row_dict = row.__dict__
+
+            # Convertir el valor de la columna 'estado' a un texto descriptivo
+            estado_map = {
+                1: "Estable",
+                2: "Delicado",
+                3: "Fallecido"
+            }
+            row_dict["estado"] = estado_map.get(row_dict.get("estado"), "Desconocido")
+
+            # Convertir el valor de la columna 'situacion' a un texto descriptivo
+            situacion_map = {
+                1: "Hospitalizado",
+                2: "Observación",
+                3: "Recuperado",
+                4: "Referido",
+                5: "Trasladado",
+                6: "Fugado",
+                7: "Fallecido"
+            }
+            row_dict["situacion"] = situacion_map.get(row_dict.get("situacion"), "Desconocido")
+
+            # Convertir el valor de la columna 'estadia' a un texto descriptivo
+            estadia_map = {
+                1: "cama",
+                2: "camilla",
+                3: "silla de ruedas",
+                4: "no aplica",
+                5: "otro"
+            }
+            row_dict["estadia"] = estadia_map.get(row_dict.get("estadia"), "Desconocido")
+
+            # Convertir el valor de la columna 'informacion' a un texto descriptivo
+            informacion_map = {
+                "SI": "SI",
+                "NO": "NO",
+                "NR": "No Responde",
+                "NE": "No Está",
+                "TI": "Teléfono Incorrecto"
+            }
+            row_dict["informacion"] = informacion_map.get(row_dict.get("informacion"), "NO")
+
+            # Convertir el valor de la columna 'parentesco' a un texto descriptivo
+            parentesco_map = {
+                1: "Madre/Padre",
+                2: "Hijo/a",
+                3: "Hermano/a",
+                4: "Abuelo/a",
+                5: "Tío/a",
+                6: "Primo/a",
+                7: "Sobrino/a",
+                8: "Yerno/Nuera",
+                9: "Esposo/a",
+                10: "Suegro/a",
+                11: "Tutor",
+                12: "Amistad",
+                13: "Novio/a",
+                14: "Cuñado/a",
+                15: "Nieto/a",
+                16: "Hijastros",
+                17: "Padrastros",
+                18: "Otro"
+            }
+            row_dict["parentesco"] = parentesco_map.get(row_dict.get("parentesco"), "Desconocido")
 
             # Convertir el valor de la columna 'especialidad' a un texto descriptivo
-            if row.especialidad == 1:
-                row.especialidad = "Medicina Interna"
-            elif row.especialidad == 2:
-                row.especialidad = "Pediatria"
-            elif row.especialidad == 3:
-                row.especialidad = "Ginecologia"
-            elif row.especialidad == 4:
-                row.especialidad = "Cirugia"
-            elif row.especialidad == 5:
-                row.especialidad = "Traumatologia"
-            elif row.especialidad == 6:
-                row.especialidad = "Psicologia"
-            elif row.especialidad == 7:
-                row.especialidad = "Nutricion"
+            especialidad_map = {
+                1: "Medicina Interna",
+                2: "Pediatria",
+                3: "Ginecologia",
+                4: "Cirugia",
+                5: "Traumatologia",
+                6: "Psicologia",
+                7: "Nutricion"
+            }
+            row_dict["especialidad"] = especialidad_map.get(row_dict.get("especialidad"), "Desconocido")
 
-        #convertir el valor de la columna tipo_consulta a un texto descriptivo
-            if row.tipo_consulta == 1:
-                row.tipo_consulta = "COEX"
-            elif row.tipo_consulta == 2:
-                row.tipo_consulta = "Hospitalización"
-            elif row.tipo_consulta == 3:
-                row.tipo_consulta = "Emergencia"
-                
-         #convertir el valor de la columna servicio a un texto descriptivo
-            if row.servicio == 1:
-                row.servicio = "SOP"
-            elif row.servicio == 2:
-                row.servicio = "Maternidad"
-            elif row.servicio == 3:
-                row.servicio = "Ginecologia"
-            elif row.servicio == 4:
-                row.servicio = "Cirugia"
-            elif row.servicio == 5:
-                row.servicio = "Cirugia pedia"
-            elif row.servicio == 6:
-                row.servicio = "Trauma"
-            elif row.servicio == 7:
-                row.servicio = "Trauma pedia"
-            elif row.servicio == 8:
-                row.servicio = "CRN"
-            elif row.servicio == 9:
-                row.servicio = "Pedia"
-            elif row.servicio == 10:
-                row.servicio = "RN"
-            elif row.servicio == 11:
-                row.servicio = "Neonatos"
-            elif row.servicio == 12:
-                row.servicio = "Medicina Hombres"
-            elif row.servicio == 13:
-                row.servicio = "Medicina Mujeres"
-            elif row.servicio == 14:
-                row.servicio = "vsvs"
-            elif row.servicio == 15:
-                row.servicio = "Covid"
-            elif row.servicio == 16:
-                row.servicio = "Labor & parto"
-            elif row.servicio == 17:
-                row.servicio = "area roja emergencia"
-            elif row.servicio == 18:
-                row.servicio = "ucin"
+            # Convertir el valor de la columna 'servicio' a un texto descriptivo
+            servicio_map = {
+                1: "SOP",
+                2: "Maternidad",
+                3: "Ginecologia",
+                4: "Cirugia",
+                5: "Cirugia pedia",
+                6: "Trauma",
+                7: "Trauma pedia",
+                8: "CRN",
+                9: "Pedia",
+                10: "RN",
+                11: "Neonatos",
+                12: "Medicina Hombres",
+                13: "Medicina Mujeres",
+                14: "vsvs",
+                15: "Covid",
+                16: "Labor & parto",
+                17: "area roja emergencia",
+                18: "ucin"
+            }
+            row_dict["servicio"] = servicio_map.get(row_dict.get("servicio"), "Desconocido")
 
-            # Eliminar la columna '_sa_instance_state'
-            del row._sa_instance_state
+            # Eliminar la columna '_sa_instance_state' si existe
+            row_dict.pop("_sa_instance_state", None)
 
-            
-                
-            # Eliminar la columna '_sa_instance_state'
-            del row._sa_instance_state
+            # Agregar la fila procesada a la lista
+            processed_data.append(row_dict)
 
+        # Crear un DataFrame de Pandas con los resultados procesados
+        df = pd.DataFrame(processed_data)
 
-        # Crear un DataFrame de Pandas con los resultados
-        df = pd.DataFrame([row.__dict__ for row in result])
+        # Especificar el orden deseado de las columnas
+        ordered_columns = [
+            'id', 'expediente', 'nombres', 'apellidos', 'estado', 'situacion', 'lugar_referencia', 'fecha_referencia', 'estadia', 'cama',
+            'especialidad', 'servicio', 'informacion', 'contacto', 'parentesco', 'telefono', 'fecha', 'hora', 'fecha_contacto', 'hora_contacto', 'nota',
+            'estudios', 'dxA', 'dxB', 'dxC', 'dxD', 'dxE', 'evolucion', 'receta_por', 'shampoo', 'toalla', 'peine', 'jabon', 'cepillo_dientes', 'pasta_dental', 'sandalias', 'agua', 'papel', 'panales'
+        ]
+        df = df[ordered_columns]
 
         # Crear un objeto BytesIO para almacenar el archivo Excel
         excel_io = BytesIO()
@@ -393,10 +432,12 @@ async def excel_uisau(
         }
 
         # Devolver una StreamingResponse con el archivo Excel
-        return StreamingResponse(io.BytesIO(excel_io.read()), headers=headers)
+        return StreamingResponse(excel_io, headers=headers)
 
     except SQLAlchemyError as error:
         raise HTTPException(status_code=500, detail=f"Error al consultar la base de datos: {error}")
+    finally:
+        db.close()  # Cerrar la sesión de la base de datos
     
 
 @router.get("/report_paciente/", tags=["Estadísticas"])
