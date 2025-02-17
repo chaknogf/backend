@@ -82,6 +82,7 @@ class Paciente(BaseModel):
     gemelo: str | None = None
     conyugue: str | None = None
     exp_ref: int | None = None
+   
     
     
 

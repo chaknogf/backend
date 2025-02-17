@@ -12,6 +12,8 @@ import logging
 
 
 
+
+
 async def check_jwt_token(request: Request, token: str = Depends(decode_token)):
     if token is None:
         raise HTTPException(status_code=401, detail="Token inválido o expirado")
@@ -38,6 +40,7 @@ app.add_middleware(
 
 # Incluye las rutas del módulo login_router
 app.include_router(login_router, tags=["login"])
+
 
 # Importación de routers y aplicación de middleware de verificación de token JWT
 app.include_router(citas_router.router, dependencies=[Depends(check_jwt_token)])

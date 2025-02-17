@@ -116,6 +116,8 @@ def buscar_id(consulta: int):
     finally:
         print(f"id: {id} datetime:{now} CONSULTADO")
         
+    
+        
 
 @router.get("/filter/", tags=["UISAU"])
 async def filtro(
@@ -129,7 +131,8 @@ async def filtro(
     nombres: str = Query(None, description="Nombres"),
     apellidos: str = Query(None, description="Apellidos"),
     usuario: int = Query(None, description="Usuario de UISAU"),
-    estadia: int = Query(None, description="Estadia de paciente")
+    estadia: int = Query(None, description="Estadia de paciente"),
+    servicio: int = Query(None, description="Servicio de paciente")
     
                 ):
     try:
@@ -170,6 +173,9 @@ async def filtro(
             
         if estadia:
             query = query.filter(bModel.estadia == estadia)
+            
+        if servicio:
+            query = query.filter(bModel.servicio == servicio)
 
         result = query.order_by(desc(bModel.id)).all()
         return result
@@ -209,6 +215,32 @@ async def editar(edit: uisau, id: int):
         result.telefono = edit.telefono
         result.informacion = edit.informacion
         result.nota = edit.nota
+        result.estudios = edit.estudios
+        result.evolucion = edit.evolucion
+        result.receta_por = edit.receta_por
+        result.shampoo = edit.shampoo
+        result.toalla = edit.toalla
+        result.peine = edit.peine
+        result.jabon = edit.jabon
+        result.agua = edit.agua
+        result.papel = edit.papel
+        result.panales = edit.panales
+        result.dxA = edit.dxA
+        result.dxB = edit.dxB
+        result.dxC = edit.dxC
+        result.dxD = edit.dxD
+        result.dxE = edit.dxE
+        result.cepillo_dientes = edit.cepillo_dientes
+        result.pasta_dental = edit.pasta_dental
+        result.cama = edit.cama
+        result.estadia = edit.estadia
+        result.servicio = edit.servicio
+        result.lugar_referencia = edit.lugar_referencia
+        result.nota = edit.nota
+        result.especialidad = edit.especialidad
+        result.situacion = edit.situacion
+        result.id_consulta = edit.id_consulta
+        
         db.commit()
         return JSONResponse(status_code=201, content={"message": "Actualizacion realizada"})
     except SQLAlchemyError as error:
