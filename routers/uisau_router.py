@@ -59,6 +59,13 @@ class uisau(BaseModel):
     dxC: str | None = None
     dxD: str | None = None
     dxE: str | None = None
+    toalla_humeda: bool | None = None
+    ropa_bebe: bool | None = None
+    ropa_interior: bool | None = None
+    panal_bebe: bool | None = None
+    panal_adulto: bool | None = None
+    babero: bool | None = None
+    otros: bool | None = None
    
     
     
@@ -240,6 +247,13 @@ async def editar(edit: uisau, id: int):
         result.especialidad = edit.especialidad
         result.situacion = edit.situacion
         result.id_consulta = edit.id_consulta
+        result.toalla_humeda = edit.toalla_humeda
+        result.ropa_bebe = edit.ropa_bebe
+        result.ropa_interior = edit.ropa_interior
+        result.panal_bebe = edit.panal_bebe
+        result.panal_adulto = edit.panal_adulto
+        result.babero = edit.babero
+        result.otros = edit.otros
         
         db.commit()
         return JSONResponse(status_code=201, content={"message": "Actualizacion realizada"})

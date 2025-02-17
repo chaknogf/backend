@@ -48,6 +48,14 @@ class Consultas(BaseModel):
     medico: str | None = None
     archived_by: str | None = None
     created_by: str | None = None
+    bomberos: bool | None = None
+    transito: bool | None = None
+    arma_blanca: bool | None = None
+    arma_fuego: bool | None = None
+    estudiante_publica: bool | None = None
+    accidente_laboral: bool | None = None
+    personal_hospital: bool | None = None
+    reserva: bool | None = None
     
     
     
@@ -480,6 +488,14 @@ async def actualizar( consulta: Consultas, id: int):
         result.folios = consulta.folios
         result.created_by = consulta.created_by
         result.archived_by = consulta.archived_by
+        result.bomberos = consulta.bomberos
+        result.transito = consulta.transito
+        result.arma_blanca = consulta.arma_blanca
+        result.arma_fuego = consulta.arma_fuego
+        result.estudiante_publica = consulta.estudiante_publica
+        result.accidente_laboral = consulta.accidente_laboral
+        result.personal_hospital = consulta.personal_hospital
+        result.reserva = consulta.reserva
         
     
         db.commit()

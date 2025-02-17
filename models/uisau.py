@@ -121,6 +121,13 @@ class uisauModel(Base):
     id_consulta = Column(Integer)
     created_by = Column(String(8))
     update_by = Column(String(8))
+    toalla_humeda = Column(Boolean)
+    ropa_bebe = Column(Boolean)
+    ropa_interior = Column(Boolean)
+    panal_bebe = Column(Boolean)
+    panal_adulto = Column(Boolean)
+    babero = Column(Boolean)
+    otros = Column(Boolean)
     # created_at = Column(String(25))
     # updated_at = Column(String(25))
    
