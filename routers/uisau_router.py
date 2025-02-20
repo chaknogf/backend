@@ -66,6 +66,7 @@ class uisau(BaseModel):
     panal_adulto: bool | None = None
     babero: bool | None = None
     otros: bool | None = None
+    receta: str | None = None
    
     
     
@@ -133,6 +134,7 @@ async def filtro(
     expediente: int = Query(None, description="Número de Expediente"),
     estado: int = Query(None, description="Estado del Paciente"),
     fecha: str = Query(None, description="Fecha de Consulta"),
+    fecha_contacto: str = Query(None, description="Fecha de Contacto"),
     fecha_referencia: str = Query(None, description="Fecha de Consulta"),
     lugar_referencia: int = Query(None, description="Lugar de referencia"),
     nombres: str = Query(None, description="Nombres"),
@@ -161,7 +163,10 @@ async def filtro(
             query = query.filter(bModel.expediente == expediente)
 
         if fecha:
-            query = query.filter(bModel.fecha.ilike(f"%{fecha}%"))
+            query = query.filter(bModel.fecha == fecha )
+
+        if fecha_contacto:
+            query = query.filter(bModel.fecha_contacto == fecha_contacto )
 
         if nombres:
             query = query.filter(bModel.nombres.ilike(f"%{nombres}%"))
@@ -254,6 +259,7 @@ async def editar(edit: uisau, id: int):
         result.panal_adulto = edit.panal_adulto
         result.babero = edit.babero
         result.otros = edit.otros
+        result.receta = edit.receta
         
         db.commit()
         return JSONResponse(status_code=201, content={"message": "Actualizacion realizada"})

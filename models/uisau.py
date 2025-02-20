@@ -103,6 +103,7 @@ class uisauModel(Base):
     estudios = Column(Text)
     evolucion = Column(Text)
     receta_por = Column(String(2))
+    receta = Column(String(100))
     shampoo = Column(Boolean)
     toalla = Column(Boolean)
     peine = Column(Boolean)

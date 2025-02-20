@@ -482,6 +482,7 @@ async def trasladar_expediente( Pacient: Paciente, id: int):
     except SQLAlchemyError as error:
         return {"message": f"Error al consultar paciente: {error}"}
     
+            
 
 @router.get("filtrar_paciente/", tags=["Pacientes"])
 async def filtro(
@@ -510,3 +511,26 @@ async def filtro(
         return result
     except Exception as err:
         return {"error": str(err)}
+    
+    
+
+@router.patch("/telefono/{exp}", tags=["Pacientes"])
+async def actualizar_paciente( Pacient: Paciente, exp: int):
+    try:
+        Db = Session()
+        result = Db.query(PacienteModel).filter(PacienteModel.expediente == exp).first()
+        if not result:
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        #result.expediente = Pacient.expediente
+        
+        result.telefono = Pacient.telefono
+        result.telefono_responsable = Pacient.telefono_responsable
+        
+        
+        
+      
+        Db.commit()
+        return JSONResponse(status_code=201, content={"message": "Actualización Realizada"})
+    except SQLAlchemyError as error:
+        return {"message": f"Error al consultar paciente: {error}"}
+    
