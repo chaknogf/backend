@@ -1,21 +1,19 @@
-from fastapi import APIRouter, HTTPException, Query, Form
+from fastapi import APIRouter, HTTPException, Query, Depends
 from pydantic import BaseModel
-from typing import List
-from datetime import date, datetime, time
-from database.database import engine, Session, Base
-from database import database
+from datetime import datetime, date
+from database.database import Session
 from models.uisau import uisauModel
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy import func, select, desc
+from sqlalchemy import desc, or_
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session as SQLAlchemySession
 
 router = APIRouter()
-db = database.get_database_connection()
-cursor = db.cursor()
 now = datetime.now()
 
-class uisau(BaseModel):
+# Definir esquema con Pydantic
+class UisauSchema(BaseModel):
     id: int
     consulta_id: int
     expediente: int | None = None
@@ -67,66 +65,108 @@ class uisau(BaseModel):
     babero: bool | None = None
     otros: bool | None = None
     receta: str | None = None
-   
-    
-    
-bModel = uisauModel
 
+    class Config:
+        from_attributes = True
 
-#Get conectado a sql
+# Dependencia para obtener sesión de base de datos
+def get_db():
+    db = Session()
+    try:
+        yield db
+    finally:
+        db.close()
+
+# Obtener todas las consultas
 @router.get("/uisau/", tags=["UISAU"])
-async def obtener_consultas():
+def obtener_consultas(db: SQLAlchemySession = Depends(get_db)):
     try:
-        db = Session()
-        result = db.query(bModel).all()
-        return JSONResponse(status_code=200, content=jsonable_encoder(result))
-    except SQLAlchemyError as error:
-        return {"message": f"error al consultar: {error}"}
-    finally:
-        print("consultado")
-        
-@router.get("/registro/", tags=["UISAU"])
-def buscar_id(id: int):
-    try:
-        db = Session()
-        result = db.query(bModel).filter(uisauModel.id == id).first()
-        if not result:
-            return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        result = db.query(uisauModel).all()
         return JSONResponse(status_code=200, content=jsonable_encoder(result))
     except SQLAlchemyError as error:
         return {"message": f"Error al consultar: {error}"}
-    finally:
-        print(f"id: {id} datetime:{now} CONSULTADO")
-        
-@router.get("/uisau_report/", tags=["UISAU"])
-def reporte_fecha(fecha: str):
-    try:
-        db = Session()
-        result = db.query(bModel).filter(uisauModel.fecha == fecha).all()
-        if not result:
-            return JSONResponse(status_code=404, content={"message": "No encontrado"})
-        return JSONResponse(status_code=200, content=jsonable_encoder(result))
-    except SQLAlchemyError as error:
-        return {"message": f"Error al consultar: {error}"}
-    finally:
-        print(f"fecha: {fecha} datetime:{now} CONSULTADO")
-        
-@router.get("/infos/", tags=["UISAU"])
-def buscar_id(consulta: int):
-    try:
-        db = Session()
-        result = db.query(bModel).filter(uisauModel.id_consulta == consulta).all()
-        if not result:
-            return JSONResponse(status_code=404, content={"message": "No encontrado"})
-        return JSONResponse(status_code=200, content=jsonable_encoder(result))
-    except SQLAlchemyError as error:
-        return {"message": f"Error al consultar: {error}"}
-    finally:
-        print(f"id: {id} datetime:{now} CONSULTADO")
-        
     
-        
+    
+@router.get("/infos/", tags=["UISAU"])
+def buscar_id(consulta: int, db: SQLAlchemySession = Depends(get_db)):
+    try:
+        result = db.query(uisauModel).filter(uisauModel.id_consulta == consulta).all()
+        if not result:
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        return JSONResponse(status_code=200, content=jsonable_encoder(result))
+    except SQLAlchemyError as error:
+        return {"message": f"Error al consultar: {error}"}
+    finally:
+        print(f"consulta_id: {consulta} datetime:{now} CONSULTADO")
 
+# Buscar consulta por ID
+@router.get("/registro/", tags=["UISAU"])
+def buscar_por_id(id: int, db: SQLAlchemySession = Depends(get_db)):
+    try:
+        result = db.query(uisauModel).filter(uisauModel.id == id).first()
+        if not result:
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        return JSONResponse(status_code=200, content=jsonable_encoder(result))
+    except SQLAlchemyError as error:
+        return {"message": f"Error al consultar: {error}"}
+
+# Buscar consultas por fecha y servicio
+@router.get("/resumen_uisau/", tags=["UISAU"])
+def reporte_fecha(fecha: str, servicio: int, db: SQLAlchemySession = Depends(get_db)):
+    try:
+        result = db.query(uisauModel).filter(
+            or_(uisauModel.fecha == fecha, uisauModel.fecha_contacto == fecha),
+            uisauModel.servicio == servicio
+        ).all()
+        if not result:
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        return JSONResponse(status_code=200, content=jsonable_encoder(result))
+    except SQLAlchemyError as error:
+        return {"message": f"Error al consultar: {error}"}
+
+# Guardar nueva consulta
+@router.post("/uisausave/", tags=["UISAU"])
+def crear_consulta(data: UisauSchema, db: SQLAlchemySession = Depends(get_db)):
+    try:
+        registro = uisauModel(**data.dict())
+        db.add(registro)
+        db.commit()
+        return JSONResponse(status_code=201, content={"message": "Se ha registrado la consulta"})
+    except SQLAlchemyError as error:
+        return {"message": f"Error al crear consulta: {error}"}
+
+# Editar consulta existente
+@router.put("/uisauedit/{id}", tags=["UISAU"])
+def editar_consulta(id: int, edit: UisauSchema, db: SQLAlchemySession = Depends(get_db)):
+    try:
+        result = db.query(uisauModel).filter(uisauModel.id == id).first()
+        if not result:
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        for key, value in edit.dict(exclude_unset=True).items():
+            setattr(result, key, value)
+        db.commit()
+        return JSONResponse(status_code=200, content={"message": "Actualización realizada"})
+    except SQLAlchemyError as error:
+        return {"message": f"Error al actualizar la consulta: {error}"}
+
+# Eliminar consulta
+# Eliminar consulta
+@router.delete("/uisaudelet/{id}", tags=["UISAU"])
+def eliminar_consulta(id: int, db: SQLAlchemySession = Depends(get_db)):
+    try:
+        result = db.query(uisauModel).filter(uisauModel.id == id).first()
+        if not result:
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        
+        db.delete(result)
+        db.commit()
+        return JSONResponse(status_code=200, content={"message": "Eliminado con éxito"})
+    
+    except SQLAlchemyError as error:
+        db.rollback()
+        return JSONResponse(status_code=500, content={"message": f"Error al eliminar: {error}"})
+
+bModel = uisauModel
 @router.get("/filter/", tags=["UISAU"])
 async def filtro(
     id: int = Query(None, description="Id"),
@@ -135,150 +175,47 @@ async def filtro(
     estado: int = Query(None, description="Estado del Paciente"),
     fecha: str = Query(None, description="Fecha de Consulta"),
     fecha_contacto: str = Query(None, description="Fecha de Contacto"),
-    fecha_referencia: str = Query(None, description="Fecha de Consulta"),
+    fecha_referencia: str = Query(None, description="Fecha de Referencia"),
     lugar_referencia: int = Query(None, description="Lugar de referencia"),
     nombres: str = Query(None, description="Nombres"),
     apellidos: str = Query(None, description="Apellidos"),
     usuario: int = Query(None, description="Usuario de UISAU"),
     estadia: int = Query(None, description="Estadia de paciente"),
-    servicio: int = Query(None, description="Servicio de paciente")
-    
-                ):
+    servicio: int = Query(None, description="Servicio de paciente"),
+    db: SQLAlchemySession = Depends(get_db)
+):
     try:
-        
-        db = Session()
-        query = db.query(bModel)
+        query = db.query(uisauModel)
 
-        # Agregar condiciones para los filtros con coincidencias parciales
         if id is not None:
-            query = query.filter(bModel.id == id)
-            
+            query = query.filter(uisauModel.id == id)
         if id_consulta is not None:
-            query = query.filter(bModel.id_consulta == id_consulta)
-            
-        if estado:
-            query = query.filter(bModel.estado == estado)
-
-        if expediente:
-            query = query.filter(bModel.expediente == expediente)
-
+            query = query.filter(uisauModel.id_consulta == id_consulta)
+        if estado is not None:
+            query = query.filter(uisauModel.estado == estado)
+        if expediente is not None:
+            query = query.filter(uisauModel.expediente == expediente)
         if fecha:
-            query = query.filter(bModel.fecha == fecha )
-
+            query = query.filter(uisauModel.fecha == fecha)
         if fecha_contacto:
-            query = query.filter(bModel.fecha_contacto == fecha_contacto )
-
+            query = query.filter(uisauModel.fecha_contacto == fecha_contacto)
         if nombres:
-            query = query.filter(bModel.nombres.ilike(f"%{nombres}%"))
-
+            query = query.filter(uisauModel.nombres.ilike(f"%{nombres}%"))
         if apellidos:
-            query = query.filter(bModel.apellidos.ilike(f"%{apellidos}%"))
-
+            query = query.filter(uisauModel.apellidos.ilike(f"%{apellidos}%"))
         if fecha_referencia:
-            query = query.filter(bModel.fecha_referencia.ilike(f"%{fecha_referencia}%"))
+            query = query.filter(uisauModel.fecha_referencia == fecha_referencia)
+        if lugar_referencia is not None:
+            query = query.filter(uisauModel.lugar_referencia == lugar_referencia)
+        if usuario is not None:
+            query = query.filter(uisauModel.usuario == usuario)
+        if estadia is not None:
+            query = query.filter(uisauModel.estadia == estadia)
+        if servicio is not None:
+            query = query.filter(uisauModel.servicio == servicio)
 
-        if lugar_referencia:
-            query = query.filter(bModel.lugar_referencia == lugar_referencia)
-            
-        if usuario:
-            query = query.filter(bModel.Usuario == usuario)
-            
-        if estadia:
-            query = query.filter(bModel.estadia == estadia)
-            
-        if servicio:
-            query = query.filter(bModel.servicio == servicio)
-
-        result = query.order_by(desc(bModel.id)).all()
-        return result
-    except Exception as e:
-        return {"error": str(e)}    
-  
-    #Post conectado a SQL
-
-@router.post("/uisausave/", tags=["UISAU"])
-async def crear(data: uisau ):
-    try:
-        db = Session()
-        
-        resgistro = bModel(**data.dict())
-        db.add(resgistro)
-        db.commit()  
-         
-        return JSONResponse(status_code=201, content={"message": "Se ha registrado la consulta"})
+        result = query.order_by(desc(uisauModel.id)).all()
+        return JSONResponse(status_code=200, content=jsonable_encoder(result))
+    
     except SQLAlchemyError as error:
-         return {"message": f"error al crear consulta: {error}"}
-    finally:
-        cursor.close()
-
-
-@router.put("/uisauedit", tags=["UISAU"])
-async def editar(edit: uisau, id: int):
-    try:
-        db = Session()
-        result = db.query(uisauModel).filter(uisauModel.id == id).first()
-        if not result:
-            return JSONResponse(status_code=404, content={"message": "No encontrado"})
-        result.parentesco = edit.parentesco
-        result.fecha_contacto = edit.fecha_contacto
-        result.hora_contacto = edit.hora_contacto
-        result.update_by = edit.update_by
-        result.contacto = edit.contacto
-        result.telefono = edit.telefono
-        result.informacion = edit.informacion
-        result.nota = edit.nota
-        result.estudios = edit.estudios
-        result.evolucion = edit.evolucion
-        result.receta_por = edit.receta_por
-        result.shampoo = edit.shampoo
-        result.toalla = edit.toalla
-        result.peine = edit.peine
-        result.jabon = edit.jabon
-        result.agua = edit.agua
-        result.papel = edit.papel
-        result.panales = edit.panales
-        result.dxA = edit.dxA
-        result.dxB = edit.dxB
-        result.dxC = edit.dxC
-        result.dxD = edit.dxD
-        result.dxE = edit.dxE
-        result.cepillo_dientes = edit.cepillo_dientes
-        result.pasta_dental = edit.pasta_dental
-        result.cama = edit.cama
-        result.estadia = edit.estadia
-        result.servicio = edit.servicio
-        result.lugar_referencia = edit.lugar_referencia
-        result.nota = edit.nota
-        result.especialidad = edit.especialidad
-        result.situacion = edit.situacion
-        result.id_consulta = edit.id_consulta
-        result.toalla_humeda = edit.toalla_humeda
-        result.ropa_bebe = edit.ropa_bebe
-        result.ropa_interior = edit.ropa_interior
-        result.panal_bebe = edit.panal_bebe
-        result.panal_adulto = edit.panal_adulto
-        result.babero = edit.babero
-        result.otros = edit.otros
-        result.receta = edit.receta
-        
-        db.commit()
-        return JSONResponse(status_code=201, content={"message": "Actualizacion realizada"})
-    except SQLAlchemyError as error:
-        return {"message": f"Error al actualizar la cita: {error}"}
-    finally:
-        db.close()
-        
-@router.delete("/uisaudelet/{id}",  tags=["UISAU"])
-async def eliminar_cita(id: int):
-    try:
-        db = Session()
-        result = db.query(uisauModel).filter(uisauModel.id == id).first()
-        if not result:
-            return JSONResponse(status_code=404, content={"message": "No encontrado"})
-        db.delete(result)
-        db.commit()
-        return JSONResponse(status_code=200, content={"message": "Eliminado con exito"})
-    except SQLAlchemyError as error:
-        return {"message": f"Error al consultar cita: {error}"}
-    finally:
-           db.close()
+        return JSONResponse(status_code=500, content={"error": str(error)})

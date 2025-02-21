@@ -1,0 +1,302 @@
+from fastapi import APIRouter, HTTPException, Query, Form
+from pydantic import BaseModel
+from typing import List
+from datetime import date, datetime, time
+from database.database import engine, Session, Base
+from database import database
+from models.uisau import uisauModel
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
+from sqlalchemy import func, select, desc
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.sql import and_, or_
+
+router = APIRouter()
+db = database.get_database_connection()
+cursor = db.cursor()
+now = datetime.now()
+
+class uisau(BaseModel):
+    id: int
+    consulta_id: int
+    expediente: int | None = None
+    nombres: str | None = None
+    apellidos: str | None = None
+    estado: int | None = None
+    situacion: int | None = None
+    lugar_referencia: int | None = None
+    fecha_referencia: date | None = None
+    estadia: int | None = None
+    cama: int | None = None
+    especialidad: int | None = None
+    servicio: int | None = None
+    informacion: str | None = None
+    contacto: str | None = None
+    parentesco: int | None = None
+    telefono: int | None = None
+    fecha: str | None = None
+    hora: str | None = None
+    fecha_contacto: str | None = None
+    hora_contacto: str | None = None
+    nota: str | None = None
+    estudios: str | None = None
+    evolucion: str | None = None
+    receta_por: str | None = None
+    id_consulta: int | None = None
+    created_by: str | None = None
+    update_by: str | None = None
+    shampoo: bool | None = None
+    toalla: bool | None = None
+    peine: bool | None = None
+    jabon: bool | None = None
+    cepillo_dientes: bool | None = None
+    pasta_dental: bool | None = None
+    sandalias: bool | None = None
+    agua: bool | None = None
+    papel: bool | None = None
+    panales: bool | None = None
+    dxA: str | None = None
+    dxB: str | None = None
+    dxC: str | None = None
+    dxD: str | None = None
+    dxE: str | None = None
+    toalla_humeda: bool | None = None
+    ropa_bebe: bool | None = None
+    ropa_interior: bool | None = None
+    panal_bebe: bool | None = None
+    panal_adulto: bool | None = None
+    babero: bool | None = None
+    otros: bool | None = None
+    receta: str | None = None
+   
+    
+    
+bModel = uisauModel
+
+
+#Get conectado a sql
+@router.get("/uisau/", tags=["UISAU"])
+async def obtener_consultas():
+    try:
+        db = Session()
+        result = db.query(bModel).all()
+        return JSONResponse(status_code=200, content=jsonable_encoder(result))
+    except SQLAlchemyError as error:
+        return {"message": f"error al consultar: {error}"}
+    finally:
+        print("consultado")
+        
+@router.get("/registro/", tags=["UISAU"])
+def buscar_id(id: int):
+    try:
+        db = Session()
+        result = db.query(bModel).filter(uisauModel.id == id).first()
+        if not result:
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        return JSONResponse(status_code=200, content=jsonable_encoder(result))
+    except SQLAlchemyError as error:
+        return {"message": f"Error al consultar: {error}"}
+    finally:
+        print(f"id: {id} datetime:{now} CONSULTADO")
+        
+@router.get("/uisau_report/", tags=["UISAU"])
+def reporte_fecha(fecha: str):
+    try:
+        db = Session()
+        result = db.query(bModel).filter(uisauModel.fecha == fecha).all()
+        if not result:
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        return JSONResponse(status_code=200, content=jsonable_encoder(result))
+    except SQLAlchemyError as error:
+        return {"message": f"Error al consultar: {error}"}
+    finally:
+        print(f"fecha: {fecha} datetime:{now} CONSULTADO")
+        
+@router.get("/infos/", tags=["UISAU"])
+def buscar_id(consulta: int):
+    try:
+        db = Session()
+        result = db.query(bModel).filter(uisauModel.id_consulta == consulta).all()
+        if not result:
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        return JSONResponse(status_code=200, content=jsonable_encoder(result))
+    except SQLAlchemyError as error:
+        return {"message": f"Error al consultar: {error}"}
+    finally:
+        print(f"id: {id} datetime:{now} CONSULTADO")
+        
+    
+        
+
+@router.get("/filter/", tags=["UISAU"])
+async def filtro(
+    id: int = Query(None, description="Id"),
+    id_consulta: int = Query(None, description="Número de id de consulta"),
+    expediente: int = Query(None, description="Número de Expediente"),
+    estado: int = Query(None, description="Estado del Paciente"),
+    fecha: str = Query(None, description="Fecha de Consulta"),
+    fecha_contacto: str = Query(None, description="Fecha de Contacto"),
+    fecha_referencia: str = Query(None, description="Fecha de Consulta"),
+    lugar_referencia: int = Query(None, description="Lugar de referencia"),
+    nombres: str = Query(None, description="Nombres"),
+    apellidos: str = Query(None, description="Apellidos"),
+    usuario: int = Query(None, description="Usuario de UISAU"),
+    estadia: int = Query(None, description="Estadia de paciente"),
+    servicio: int = Query(None, description="Servicio de paciente")
+    
+                ):
+    try:
+        
+        db = Session()
+        query = db.query(bModel)
+
+        # Agregar condiciones para los filtros con coincidencias parciales
+        if id is not None:
+            query = query.filter(bModel.id == id)
+            
+        if id_consulta is not None:
+            query = query.filter(bModel.id_consulta == id_consulta)
+            
+        if estado:
+            query = query.filter(bModel.estado == estado)
+
+        if expediente:
+            query = query.filter(bModel.expediente == expediente)
+
+        if fecha:
+            query = query.filter(bModel.fecha == fecha )
+
+        if fecha_contacto:
+            query = query.filter(bModel.fecha_contacto == fecha_contacto )
+
+        if nombres:
+            query = query.filter(bModel.nombres.ilike(f"%{nombres}%"))
+
+        if apellidos:
+            query = query.filter(bModel.apellidos.ilike(f"%{apellidos}%"))
+
+        if fecha_referencia:
+            query = query.filter(bModel.fecha_referencia.ilike(f"%{fecha_referencia}%"))
+
+        if lugar_referencia:
+            query = query.filter(bModel.lugar_referencia == lugar_referencia)
+            
+        if usuario:
+            query = query.filter(bModel.Usuario == usuario)
+            
+        if estadia:
+            query = query.filter(bModel.estadia == estadia)
+            
+        if servicio:
+            query = query.filter(bModel.servicio == servicio)
+
+        result = query.order_by(desc(bModel.id)).all()
+        return result
+    except Exception as e:
+        return {"error": str(e)}    
+  
+  
+@router.get("/resumen_uisau/", tags=["UISAU"])
+def reporte_fecha(fecha: str, servicio: int):
+    try:
+        # Realizar la consulta filtrando por fecha y servicio
+        result = db.query(uisauModel).filter(
+            or_(uisauModel.fecha == fecha, uisauModel.fecha_contacto == fecha),
+            uisauModel.servicio == servicio  # Filtro adicional por servicio
+        ).all()
+        if not result:
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        return JSONResponse(status_code=200, content=jsonable_encoder(result))
+    except SQLAlchemyError as error:
+        return {"message": f"Error al consultar: {error}"}
+    finally:
+        print(f"fecha: {fecha} datetime:{now} CONSULTADO")
+
+    #Post conectado a SQL
+
+@router.post("/uisausave/", tags=["UISAU"])
+async def crear(data: uisau ):
+    try:
+        db = Session()
+        
+        resgistro = bModel(**data.dict())
+        db.add(resgistro)
+        db.commit()  
+         
+        return JSONResponse(status_code=201, content={"message": "Se ha registrado la consulta"})
+    except SQLAlchemyError as error:
+         return {"message": f"error al crear consulta: {error}"}
+    finally:
+        cursor.close()
+
+
+@router.put("/uisauedit", tags=["UISAU"])
+async def editar(edit: uisau, id: int):
+    try:
+        db = Session()
+        result = db.query(uisauModel).filter(uisauModel.id == id).first()
+        if not result:
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        result.parentesco = edit.parentesco
+        result.fecha_contacto = edit.fecha_contacto
+        result.hora_contacto = edit.hora_contacto
+        result.update_by = edit.update_by
+        result.contacto = edit.contacto
+        result.telefono = edit.telefono
+        result.informacion = edit.informacion
+        result.nota = edit.nota
+        result.estudios = edit.estudios
+        result.evolucion = edit.evolucion
+        result.receta_por = edit.receta_por
+        result.shampoo = edit.shampoo
+        result.toalla = edit.toalla
+        result.peine = edit.peine
+        result.jabon = edit.jabon
+        result.agua = edit.agua
+        result.papel = edit.papel
+        result.panales = edit.panales
+        result.dxA = edit.dxA
+        result.dxB = edit.dxB
+        result.dxC = edit.dxC
+        result.dxD = edit.dxD
+        result.dxE = edit.dxE
+        result.cepillo_dientes = edit.cepillo_dientes
+        result.pasta_dental = edit.pasta_dental
+        result.cama = edit.cama
+        result.estadia = edit.estadia
+        result.servicio = edit.servicio
+        result.lugar_referencia = edit.lugar_referencia
+        result.nota = edit.nota
+        result.especialidad = edit.especialidad
+        result.situacion = edit.situacion
+        result.id_consulta = edit.id_consulta
+        result.toalla_humeda = edit.toalla_humeda
+        result.ropa_bebe = edit.ropa_bebe
+        result.ropa_interior = edit.ropa_interior
+        result.panal_bebe = edit.panal_bebe
+        result.panal_adulto = edit.panal_adulto
+        result.babero = edit.babero
+        result.otros = edit.otros
+        result.receta = edit.receta
+        
+        db.commit()
+        return JSONResponse(status_code=201, content={"message": "Actualizacion realizada"})
+    except SQLAlchemyError as error:
+        return {"message": f"Error al actualizar la cita: {error}"}
+    finally:
+        db.close()
+        
+@router.delete("/uisaudelet/{id}",  tags=["UISAU"])
+async def eliminar_cita(id: int):
+    try:
+        db = Session()
+        result = db.query(uisauModel).filter(uisauModel.id == id).first()
+        if not result:
+            return JSONResponse(status_code=404, content={"message": "No encontrado"})
+        db.delete(result)
+        db.commit()
+        return JSONResponse(status_code=200, content={"message": "Eliminado con exito"})
+    except SQLAlchemyError as error:
+        return {"message": f"Error al consultar cita: {error}"}
+    finally:
+           db.close()
