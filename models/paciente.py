@@ -124,8 +124,8 @@ class PacienteModel(Base):
     gemelo = Column(String(2))
     conyugue = Column(String(100))
     exp_ref = Column(Integer)
-    created_at = Column(String(25))
-    update_at = Column(String(25))
+    #created_at = Column(String(25))
+    #update_at = Column(String(25))
     
    
 # Configura la relación con la tabla de citas

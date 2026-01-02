@@ -23,30 +23,35 @@ def correlativo_unico():
         with Session() as db:
             # Obtén la fecha actual
             fecha_actual = datetime.now()
-            # Obtén el año actual
             año_actual = fecha_actual.year
-            # Calcula la fecha de ayer
-            ayer = (fecha_actual - timedelta(days=1)).year
+
+            # Busca el último registro agregado
+            ultimo_registro = db.execute(
+                select(Cons_NacModel).order_by(Cons_NacModel.id.desc()).limit(1)
+            ).scalar()
 
             cor_nuevo = None
 
-            # Verifica si el año ha cambiado y reinicia el contador
-            if año_actual != ayer:
-                cor_nuevo = 1  # Reinicia a 00001
-            elif cor_nuevo is None:
-                
-                cor_nuevo = db.execute(select(func.max(Cons_NacModel.cor))).scalar() or 0
-                cor_nuevo = 1 + cor_nuevo  # Incrementa el correlativo
+            if ultimo_registro is None:
+                # Si no hay registros, inicia en 1
+                cor_nuevo = 1
+            elif ultimo_registro.ao != año_actual:
+                # Si el año del último registro es diferente al actual, reinicia
+                cor_nuevo = 1
+            else:
+                # Si es el mismo año, incrementa el correlativo
+                cor_nuevo = (ultimo_registro.cor or 0) + 1
 
-            # Formatea el correlativo con 5 dígitos
+            # Formatea el correlativo con 4 dígitos
             correlativo_formateado = str(cor_nuevo).zfill(4)
 
             return {"cor": correlativo_formateado, "año": año_actual}
+            
     except SQLAlchemyError as error:
-        # Maneja la excepción de manera adecuada, podrías registrar el error
-        return {"error": "Error al consultar la base de datos"}
-        
-        
+        return {"error": "Error al consultar la base de datos", "detalles": str(error)}
+
+
+
 class ConsNac(BaseModel):
     id: int 
     fecha: date
@@ -143,6 +148,7 @@ async def crear_cor(data: ConsNac):
     try:
         db = Session()
         
+        # Verificación de duplicados
         consulta_verificacion = db.query(Cons_NacModel).filter(
             Cons_NacModel.madre == data.madre,
             Cons_NacModel.fecha_parto == data.fecha_parto,
@@ -152,15 +158,34 @@ async def crear_cor(data: ConsNac):
         if consulta_verificacion:
             return JSONResponse(status_code=400, content={"message": "ya existe constancia para paciente"})
         
+        # Obtener correlativo antes de crear
+        correlativo_data = correlativo_unico()
+        
+        # Verificar si hubo error al generar correlativo
+        if "error" in correlativo_data:
+            raise HTTPException(status_code=500, detail=correlativo_data["error"])
+        
+        # Actualizar los datos con el correlativo y año
+        data.cor = int(correlativo_data["cor"])
+        data.ao = correlativo_data["año"]
+        
+        # Crear el documento
         documento = Cons_NacModel(**data.dict())
         db.add(documento)
         db.commit()
-        correlativo_unico()
-        return JSONResponse(status_code=201, content={"message": "Registrado con exito"})
+        
+        return JSONResponse(status_code=201, content={
+            "message": "Registrado con éxito",
+            "correlativo": correlativo_data["cor"],
+            "año": correlativo_data["año"]
+        })
+        
     except SQLAlchemyError as error:
+        db.rollback()
         raise HTTPException(status_code=500, detail=f"Error al consultar: {error}")
     finally:
-        db.close()
+        db.close() 
+
         
 #put
 
