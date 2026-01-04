@@ -95,7 +95,7 @@ async def redirect_to_docs():
 # Logging
 # =========================
 
-log = logging.getLogger("custom.access")
+log = logging.getLogger("backend")
 log.setLevel(logging.INFO)
 
 handler = logging.StreamHandler()
@@ -107,21 +107,18 @@ log.addHandler(handler)
 
 @app.middleware("http")
 async def custom_logging(request: Request, call_next):
-    # Permitir OpenAPI y docs sin interferencias
-    if request.url.path in ["/openapi.json", "/docs", "/redoc"]:
-        return await call_next(request)
 
-    request.state.client_ip = request.client.host
-    request.state.client_port = request.client.port
+    if request.url.path in ("/openapi.json", "/docs", "/redoc"):
+        return await call_next(request)
 
     response = await call_next(request)
 
+    client_ip = request.client.host if request.client else "unknown"
+    client_port = request.client.port if request.client else "unknown"
+
     log.info(
-        "",
-        extra={
-            "client_ip": request.state.client_ip,
-            "client_port": request.state.client_port,
-        },
+        "request",
+        extra={"client_ip": client_ip, "client_port": client_port}
     )
 
     return response
