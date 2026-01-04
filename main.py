@@ -2,7 +2,6 @@ from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 import logging
-import os
 
 from middlewares.error_hendler import ErrorHandler
 from login_router import router as login_router
@@ -41,48 +40,38 @@ app = FastAPI(
     title="Hospital API",
     version="1.0.0",
     description="API para gestión hospitalaria",
+    openapi_version="3.0.2",
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json"
 )
 
 # =========================
-# CORS Configuration
+# Middlewares
 # =========================
-
-# Define allowed origins
 origins = [
     "http://localhost:4200",
     "http://localhost:4201",
     "https://hosptecpan.space",
     "https://www.hosptecpan.space",
-    ["*"]
 ]
 
-# Add environment variable for additional origins if needed
-if os.getenv("ADDITIONAL_ORIGINS"):
-    origins.extend(os.getenv("ADDITIONAL_ORIGINS").split(","))
+
+app.add_middleware(ErrorHandler)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type", "Accept"],
-    max_age=3600,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
-
-# =========================
-# Other Middlewares
-# =========================
-
-app.add_middleware(ErrorHandler)
 
 # =========================
 # Routers públicos
 # =========================
 
-app.include_router(login_router, prefix="/auth", tags=["Autenticación"])
+app.include_router(login_router, prefix="/auth", tags=["login"])
 
 # =========================
 # Routers protegidos con JWT
@@ -90,17 +79,61 @@ app.include_router(login_router, prefix="/auth", tags=["Autenticación"])
 
 protected_dependencies = [Depends(check_jwt_token)]
 
-app.include_router(citas_router.router, dependencies=protected_dependencies)
-app.include_router(paciente_router.router, dependencies=protected_dependencies)
-app.include_router(municipio.router, dependencies=protected_dependencies)
-app.include_router(consultas_router.router, dependencies=protected_dependencies)
-app.include_router(pandas.router, dependencies=protected_dependencies)
-app.include_router(uisau_router.router, dependencies=protected_dependencies)
-app.include_router(usuarios_router.router, dependencies=protected_dependencies)
-app.include_router(medicos_router.router, dependencies=protected_dependencies)
-app.include_router(cie10_router.router, dependencies=protected_dependencies)
-app.include_router(cons_nac_router.router, dependencies=protected_dependencies)
-app.include_router(procedimientos_medicos_router.router, dependencies=protected_dependencies)
+app.include_router(
+    citas_router.router, 
+    dependencies=protected_dependencies,
+    tags=["Citas"] if not hasattr(citas_router.router, 'tags') else []
+)
+app.include_router(
+    paciente_router.router, 
+    dependencies=protected_dependencies,
+    tags=["Pacientes"] if not hasattr(paciente_router.router, 'tags') else []
+)
+app.include_router(
+    municipio.router, 
+    dependencies=protected_dependencies,
+    tags=["Municipios"] if not hasattr(municipio.router, 'tags') else []
+)
+app.include_router(
+    consultas_router.router, 
+    dependencies=protected_dependencies,
+    tags=["Consultas"] if not hasattr(consultas_router.router, 'tags') else []
+)
+app.include_router(
+    pandas.router, 
+    dependencies=protected_dependencies,
+    tags=["Pandas"] if not hasattr(pandas.router, 'tags') else []
+)
+app.include_router(
+    uisau_router.router, 
+    dependencies=protected_dependencies,
+    tags=["UISAU"] if not hasattr(uisau_router.router, 'tags') else []
+)
+app.include_router(
+    usuarios_router.router, 
+    dependencies=protected_dependencies,
+    tags=["Usuarios"] if not hasattr(usuarios_router.router, 'tags') else []
+)
+app.include_router(
+    medicos_router.router, 
+    dependencies=protected_dependencies,
+    tags=["Médicos"] if not hasattr(medicos_router.router, 'tags') else []
+)
+app.include_router(
+    cie10_router.router, 
+    dependencies=protected_dependencies,
+    tags=["CIE-10"] if not hasattr(cie10_router.router, 'tags') else []
+)
+app.include_router(
+    cons_nac_router.router, 
+    dependencies=protected_dependencies,
+    tags=["Consultas Nacionales"] if not hasattr(cons_nac_router.router, 'tags') else []
+)
+app.include_router(
+    procedimientos_medicos_router.router,
+    dependencies=protected_dependencies,
+    tags=["Procedimientos Médicos"] if not hasattr(procedimientos_medicos_router.router, 'tags') else []
+)
 
 # =========================
 # Root → Docs
@@ -112,7 +145,7 @@ async def redirect_to_docs():
 
 @app.get("/health", tags=["Health"])
 async def health_check():
-    return {"status": "healthy", "version": "1.0.0"}
+    return {"status": "healthy"}
 
 # =========================
 # Logging
