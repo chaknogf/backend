@@ -71,7 +71,7 @@ app.add_middleware(
 # Routers públicos
 # =========================
 
-app.include_router(login_router, prefix="/auth", tags=["login"])
+app.include_router(login_router)
 
 # =========================
 # Routers protegidos con JWT
