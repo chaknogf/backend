@@ -56,6 +56,7 @@ origins = [
     "http://localhost:4201",
     "https://hosptecpan.space",
     "https://www.hosptecpan.space",
+    ["*"]
 ]
 
 # Add environment variable for additional origins if needed
