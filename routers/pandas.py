@@ -1,5 +1,7 @@
 import io
-from fastapi import APIRouter, File, HTTPException, UploadFile, Query
+from fastapi import APIRouter, File, HTTPException, UploadFile, Query, Depends
+from database.database import get_db
+from sqlalchemy.orm import Session
 from fastapi.responses import StreamingResponse
 from io import BytesIO
 import pandas as pd  # Importa Pandas
@@ -12,7 +14,9 @@ from models.procedimientos import ProceMedicosModel, CodigosProceModel
 from models.medicos import MedicosModel
 from datetime import datetime, timedelta
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import func
 import re
+from database.database import get_database_session
 #from municipio import municipios
 
 
@@ -138,6 +142,12 @@ async def report_renap(
        
 
         
+def bool_to_text(value):
+    if value == 1:
+        return "Sí"
+    if value == 0:
+        return "No"
+    return ""
 
 
 @router.get("/report_consult/", tags=["Estadísticas"])
@@ -155,16 +165,24 @@ async def excel_consultas(
         if not result:
             raise HTTPException(status_code=404, detail="No hay datos en el rango de fechas seleccionado")
 
-       # Corregir datos según necesidades específicas
         # Corregir datos según necesidades específicas
         for row in result:
-            # Convertir el valor de la columna 'status' a un texto descriptivo
+            # booleanos
+            row.bomberos = bool_to_text(row.bomberos)
+            row.transito = bool_to_text(row.transito)
+            row.arma_blanca = bool_to_text(row.arma_blanca)
+            row.arma_fuego = bool_to_text(row.arma_fuego)
+            row.estudiante_publica = bool_to_text(row.estudiante_publica)
+            row.accidente_laboral = bool_to_text(row.accidente_laboral)
+            row.personal_hospital = bool_to_text(row.personal_hospital)
+
+            # status
             if row.status == 1:
                 row.status = "Activo"
             elif row.status == 2:
                 row.status = "Archivado"
 
-            # Convertir el valor de la columna 'especialidad' a un texto descriptivo
+            # especialidad
             if row.especialidad == 1:
                 row.especialidad = "Medicina Interna"
             elif row.especialidad == 2:
@@ -179,16 +197,20 @@ async def excel_consultas(
                 row.especialidad = "Psicologia"
             elif row.especialidad == 7:
                 row.especialidad = "Nutricion"
+            elif row.especialidad == 8:
+                row.especialidad = "Odontologia"
+            elif row.especialidad == 0:
+                row.especialidad = "General"
 
-        #convertir el valor de la columna tipo_consulta a un texto descriptivo
+            # tipo_consulta
             if row.tipo_consulta == 1:
                 row.tipo_consulta = "COEX"
             elif row.tipo_consulta == 2:
                 row.tipo_consulta = "Hospitalización"
             elif row.tipo_consulta == 3:
                 row.tipo_consulta = "Emergencia"
-                
-         #convertir el valor de la columna servicio a un texto descriptivo
+
+            # servicio
             if row.servicio == 1:
                 row.servicio = "SOP"
             elif row.servicio == 2:
@@ -233,7 +255,7 @@ async def excel_consultas(
         # Crear un DataFrame de Pandas con los resultados
         df = pd.DataFrame([row.__dict__ for row in result])
         
-       # Limpiar y validar fechas
+        # Limpiar y validar fechas
         fecha_actual = pd.to_datetime(datetime.now().date())
         df['fecha_consulta'] = pd.to_datetime(df['fecha_consulta'], errors='coerce')
         df['fecha_egreso'] = pd.to_datetime(df['fecha_egreso'], errors='coerce').fillna(fecha_actual)
@@ -250,10 +272,17 @@ async def excel_consultas(
         
         # Especificar el orden deseado de las columnas
         ordered_columns = [
-            'id', 'hoja_emergencia', 'expediente', 'fecha_consulta', 'hora', 'nombres', 'apellidos', 
-            'nacimiento', 'edad', 'sexo', 'dpi', 'direccion', 'acompa', 'parente', 'telefono', 'nota', 
-            'especialidad', 'servicio', 'status', 'fecha_egreso', 'fecha_recepcion', 'tipo_consulta', 
-            'prenatal', 'lactancia', 'dx', 'folios', 'medico', 'archived_by', 'created_by', 'dias_ocupados', 'grupo_edad'
+            'id', 'hoja_emergencia', 'expediente', 'fecha_consulta', 'hora',
+            'nombres', 'apellidos', 'nacimiento', 'edad', 'sexo', 'dpi',
+            'direccion', 'acompa', 'parente', 'telefono',
+
+            'bomberos', 'transito', 'arma_blanca', 'arma_fuego',
+            'estudiante_publica', 'accidente_laboral', 'personal_hospital',
+
+            'nota', 'especialidad', 'servicio', 'status',
+            'fecha_egreso', 'fecha_recepcion', 'tipo_consulta',
+            'prenatal', 'lactancia', 'dx', 'folios', 'medico',
+            'archived_by', 'created_by', 'dias_ocupados', 'grupo_edad'
         ]
         df = df[ordered_columns]
         
@@ -508,7 +537,6 @@ async def excel_pacientes():
 
         # Crear un DataFrame de Pandas con los resultados
         df = pd.DataFrame([row.__dict__ for row in result])
-
         # Crear un objeto BytesIO para almacenar el archivo Excel
         excel_io = BytesIO()
 
@@ -725,3 +753,66 @@ def classify_age_group(days):
         return "Adulto mayor"
 
    
+@router.get("/consultas/inactivas/excel", tags=["Consultas"])
+def consultas_inactivas_excel(db: Session = Depends(get_database_session)):
+    try:
+        # Fecha límite: 18 meses atrás (~548 días)
+        fecha_limite = datetime.now() - timedelta(days=548)
+
+        # Subconsulta: última consulta por expediente
+        subquery = (
+            db.query(
+                ConsultasModel.expediente,
+                func.max(ConsultasModel.fecha_consulta).label("ultima_consulta")
+            )
+            .group_by(ConsultasModel.expediente)
+            .subquery()
+        )
+
+        # Consulta principal
+        result = (
+            db.query(
+                ConsultasModel.expediente.label("Expediente"),
+                ConsultasModel.nombres.label("Nombres"),
+                ConsultasModel.apellidos.label("Apellidos"),
+                ConsultasModel.fecha_consulta.label("Última consulta")
+            )
+            .join(
+                subquery,
+                (ConsultasModel.expediente == subquery.c.expediente) &
+                (ConsultasModel.fecha_consulta == subquery.c.ultima_consulta)
+            )
+            .filter(ConsultasModel.fecha_consulta < fecha_limite)
+            .order_by(ConsultasModel.fecha_consulta.asc())
+            .all()
+        )
+
+        if not result:
+            raise HTTPException(
+                status_code=404,
+                detail="No se encontraron expedientes con consultas mayores a un año y medio"
+            )
+
+        # Convertir a DataFrame
+        df = pd.DataFrame(result)
+
+        # Crear Excel en memoria
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+            df.to_excel(writer, index=False, sheet_name="Consultas Inactivas")
+
+        output.seek(0)
+
+        return StreamingResponse(
+            output,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={
+                "Content-Disposition": "attachment; filename=consultas_inactivas.xlsx"
+            }
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error al generar el Excel: {str(e)}"
+        )

@@ -34,6 +34,12 @@ def get_database_session() -> Session:
     db = Session()
     return db
 
+def get_db() -> Session:
+    db = Session()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 #Base.metada.create_all(bind=engine)
